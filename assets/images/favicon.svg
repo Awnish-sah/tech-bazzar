@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="14" fill="#070A11" />
+  <rect width="64" height="64" rx="14" stroke="#1E293B" stroke-width="1.5" />
+  
+  <defs>
+    <linearGradient id="favApex" x1="20" y1="10" x2="38" y2="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#00F5D4" />
+      <stop offset="60%" stop-color="#06B6D4" />
+      <stop offset="100%" stop-color="#0284C7" />
+    </linearGradient>
+    <linearGradient id="favFoot" x1="16" y1="34" x2="28" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0B3D91" />
+      <stop offset="100%" stop-color="#2563EB" />
+    </linearGradient>
+    <linearGradient id="favLeg" x1="36" y1="20" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="50%" stop-color="#2563EB" />
+      <stop offset="100%" stop-color="#1D4ED8" />
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(1, 4) scale(0.31)">
+    <!-- 1. Top Apex Triangle -->
+    <path d="M 100 16 L 118 46 L 75 92 L 64 92 Z" fill="url(#favApex)" />
+    <!-- 2. Lower-Left Accent Wedge -->
+    <path d="M 60 98 L 82 81 L 70 126 L 48 126 Z" fill="url(#favFoot)" />
+    <!-- 3. Right Leg Diagonal -->
+    <path d="M 114 46 L 102 64 L 122 126 L 152 126 Z" fill="url(#favLeg)" />
+  </g>
+</svg>
+

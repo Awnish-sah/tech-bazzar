@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 64" fill="none" width="100%" height="100%">
+  <defs>
+    <!-- Facet 1: Cyan-Teal Apex Gradient -->
+    <linearGradient id="logoApexGrad" x1="64" y1="16" x2="118" y2="76" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#00F5D4" />
+      <stop offset="35%" stop-color="#14B8A6" />
+      <stop offset="80%" stop-color="#0284C7" />
+      <stop offset="100%" stop-color="#0369A1" />
+    </linearGradient>
+
+    <!-- Facet 2: Deep Indigo-Royal Blue -->
+    <linearGradient id="logoLeftFootGrad" x1="48" y1="98" x2="88" y2="126" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0B3D91" />
+      <stop offset="45%" stop-color="#1D4ED8" />
+      <stop offset="100%" stop-color="#2563EB" />
+    </linearGradient>
+
+    <!-- Facet 3: Azure-Electric Blue Right Leg -->
+    <linearGradient id="logoRightLegGrad" x1="102" y1="46" x2="152" y2="126" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="40%" stop-color="#2563EB" />
+      <stop offset="85%" stop-color="#1D4ED8" />
+      <stop offset="100%" stop-color="#0A2563" />
+    </linearGradient>
+
+    <linearGradient id="logoTextGrad" x1="72" y1="0" x2="240" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#F1F5F9" />
+    </linearGradient>
+  </defs>
+
+  <!-- Logo Mark (Left) -->
+  <g transform="translate(-14, 2) scale(0.42)">
+    <!-- 1. Top Apex Triangle -->
+    <path d="M 100 16 L 118 46 L 75 92 L 64 92 Z" fill="url(#logoApexGrad)" />
+    <!-- 2. Lower-Left Accent Wedge -->
+    <path d="M 60 98 L 82 81 L 70 126 L 48 126 Z" fill="url(#logoLeftFootGrad)" />
+    <!-- 3. Right Leg Diagonal -->
+    <path d="M 114 46 L 102 64 L 122 126 L 152 126 Z" fill="url(#logoRightLegGrad)" />
+    <!-- Highlight line -->
+    <line x1="100" y1="16" x2="64" y2="92" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="2" stroke-linecap="round" />
+  </g>
+
+  <!-- Typography: AVISHA TECH -->
+  <text x="64" y="35" font-family="'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="700" letter-spacing="0.06em" fill="url(#logoTextGrad)">
+    AVISHA
+  </text>
+  <text x="170" y="35" font-family="'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="500" letter-spacing="0.06em" fill="#38BDF8">
+    TECH
+  </text>
+
+  <!-- Subtitle Tag: SOFTWARE & CLOUD ENGINEERING -->
+  <text x="65" y="50" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="7.5" font-weight="600" letter-spacing="0.22em" fill="#14B8A6">
+    SOFTWARE &amp; CLOUD ENGINEERING
+  </text>
+
+  <!-- Verified Live Status Dot -->
+  <circle cx="316" cy="28" r="3.5" fill="#10B981" />
+  <circle cx="316" cy="28" r="7" fill="#10B981" fill-opacity="0.2" />
+</svg>
+

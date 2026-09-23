@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" width="100%" height="100%">
+  <defs>
+    <!-- Facet 1: Cyan-Teal Apex Gradient -->
+    <linearGradient id="apexGrad" x1="64" y1="16" x2="118" y2="76" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#00F5D4" />
+      <stop offset="35%" stop-color="#14B8A6" />
+      <stop offset="80%" stop-color="#0284C7" />
+      <stop offset="100%" stop-color="#0369A1" />
+    </linearGradient>
+
+    <!-- Facet 2: Deep Indigo-Royal Blue Lower-Left Shard -->
+    <linearGradient id="leftFootGrad" x1="48" y1="98" x2="88" y2="126" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0B3D91" />
+      <stop offset="45%" stop-color="#1D4ED8" />
+      <stop offset="100%" stop-color="#2563EB" />
+    </linearGradient>
+
+    <!-- Facet 3: Vivid Sky-Azure Electric Blue Right Leg -->
+    <linearGradient id="rightLegGrad" x1="102" y1="46" x2="152" y2="126" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="40%" stop-color="#2563EB" />
+      <stop offset="85%" stop-color="#1D4ED8" />
+      <stop offset="100%" stop-color="#0A2563" />
+    </linearGradient>
+
+    <!-- Specular Gradient -->
+    <linearGradient id="specularGlow" x1="100" y1="16" x2="70" y2="92" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.6" />
+      <stop offset="60%" stop-color="#FFFFFF" stop-opacity="0.1" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Ambient Shadow & Glow -->
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Ambient Backdrop Glow -->
+  <ellipse cx="102" cy="74" rx="46" ry="46" fill="#06B6D4" opacity="0.15" filter="url(#softGlow)" />
+
+  <g id="avisha-logo-facets">
+    <!-- 1. Top Apex Triangular Shard -->
+    <path d="M 100 16 L 118 46 L 75 92 L 64 92 Z" 
+          fill="url(#apexGrad)" />
+
+    <!-- 2. Lower-Left Accent Wedge -->
+    <path d="M 60 98 L 82 81 L 70 126 L 48 126 Z" 
+          fill="url(#leftFootGrad)" />
+
+    <!-- 3. Right Leg Diagonal Parallelogram -->
+    <path d="M 114 46 L 102 64 L 122 126 L 152 126 Z" 
+          fill="url(#rightLegGrad)" />
+
+    <!-- Crisp Specular Edge Highlight -->
+    <line x1="100" y1="16" x2="64" y2="92" stroke="url(#specularGlow)" stroke-width="1.5" stroke-linecap="round" />
+    <line x1="100" y1="16" x2="118" y2="46" stroke="#A7F3D0" stroke-width="1" stroke-opacity="0.5" stroke-linecap="round" />
+    <line x1="114" y1="46" x2="152" y2="126" stroke="#93C5FD" stroke-width="1.2" stroke-opacity="0.4" stroke-linecap="round" />
+  </g>
+</svg>
+
