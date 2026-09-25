@@ -368,6 +368,15 @@ export const UserDashboard = () => {
                             }`}>
                               {order.status}
                             </span>
+                            {order.status === 'Cancelled' && (
+                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                order.cancelAcknowledged
+                                  ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
+                                  : 'bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
+                              }`}>
+                                {order.cancelAcknowledged ? '✓ Admin Acknowledged' : '• Awaiting Admin Review'}
+                              </span>
+                            )}
                           </div>
 
                           <div className="flex items-center gap-3 font-semibold">

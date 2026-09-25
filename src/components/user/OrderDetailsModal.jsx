@@ -127,6 +127,38 @@ export const OrderDetailsModal = () => {
             )}
           </div>
 
+          {/* Cancellation Acknowledgment Status Banner */}
+          {order.status === 'Cancelled' && (
+            <div className={`p-3.5 rounded-xl border text-xs flex items-center justify-between gap-3 ${
+              order.cancelAcknowledged
+                ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300'
+                : 'bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-800/60 text-rose-800 dark:text-rose-300'
+            }`}>
+              <div className="space-y-0.5">
+                <p className="font-bold flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                  <span>
+                    {order.cancelAcknowledged
+                      ? 'Cancellation Officially Acknowledged by Admin'
+                      : 'Cancellation Submitted • Awaiting Admin Review'}
+                  </span>
+                </p>
+                {order.cancelReason && (
+                  <p className="text-[11px] opacity-85">
+                    Reason: "{order.cancelReason}"
+                  </p>
+                )}
+              </div>
+              <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0 ${
+                order.cancelAcknowledged
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-amber-500 text-white'
+              }`}>
+                {order.cancelAcknowledged ? 'Acknowledged ✓' : 'Pending Admin'}
+              </span>
+            </div>
+          )}
+
           {/* Items Section */}
           <div>
             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">

@@ -160,10 +160,23 @@ export const api = {
     });
   },
 
+  acknowledgeCancelOrder: async (orderId) => {
+    return request(`/orders/${orderId}/acknowledge-cancel`, {
+      method: 'PATCH'
+    });
+  },
+
   returnOrder: async (orderId, { reason, comments } = {}) => {
     return request(`/orders/${orderId}/return`, {
       method: 'POST',
       body: JSON.stringify({ reason, comments })
+    });
+  },
+
+  resolveReturnOrder: async (orderId, action) => {
+    return request(`/orders/${orderId}/resolve-return`, {
+      method: 'PATCH',
+      body: JSON.stringify({ action })
     });
   },
 

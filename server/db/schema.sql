@@ -104,6 +104,8 @@ CREATE TABLE IF NOT EXISTS orders (
     delivered_at TIMESTAMPTZ,
     cancel_reason TEXT,
     cancelled_at TIMESTAMPTZ,
+    cancel_acknowledged BOOLEAN DEFAULT FALSE,
+    cancel_acknowledged_at TIMESTAMPTZ,
     return_reason TEXT,
     return_comments TEXT,
     return_requested_at TIMESTAMPTZ,
@@ -162,6 +164,8 @@ ALTER TABLE orders ADD COLUMN IF NOT EXISTS estimated_delivery TIMESTAMPTZ;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivered_at TIMESTAMPTZ;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS cancel_reason TEXT;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS cancelled_at TIMESTAMPTZ;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS cancel_acknowledged BOOLEAN DEFAULT FALSE;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS cancel_acknowledged_at TIMESTAMPTZ;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS return_reason TEXT;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS return_comments TEXT;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS return_requested_at TIMESTAMPTZ;

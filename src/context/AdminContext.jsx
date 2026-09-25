@@ -264,6 +264,54 @@ export const AdminProvider = ({ children }) => {
     }
   };
 
+  // Acknowledge a customer-cancelled order
+  const acknowledgeCancellation = async (orderId) => {
+    const now = new Date().toISOString();
+    setOrders(prev => prev.map(o => {
+      if (o.id === orderId) {
+        return { ...o, cancelAcknowledged: true, cancelAcknowledgedAt: now };
+      }
+      return o;
+    }));
+
+    if (dbConnectionStatus === 'connected') {
+      try {
+        const res = await api.acknowledgeCancelOrder(orderId);
+        if (res.data) {
+          setOrders(prev => prev.map(o => o.id === orderId ? res.data : o));
+        }
+      } catch (err) {
+        console.warn('Could not acknowledge cancellation in PostgreSQL:', err.message);
+      }
+    }
+  };
+
+  // Resolve a customer return request (Approve or Reject)
+  const resolveReturn = async (orderId, action) => {
+    const isApprove = action === 'Approve';
+    setOrders(prev => prev.map(o => {
+      if (o.id === orderId) {
+        return {
+          ...o,
+          status: isApprove ? 'Returned' : 'Delivered',
+          returnStatus: isApprove ? 'Approved' : 'Rejected'
+        };
+      }
+      return o;
+    }));
+
+    if (dbConnectionStatus === 'connected') {
+      try {
+        const res = await api.resolveReturnOrder(orderId, action);
+        if (res.data) {
+          setOrders(prev => prev.map(o => o.id === orderId ? res.data : o));
+        }
+      } catch (err) {
+        console.warn('Could not resolve return in PostgreSQL:', err.message);
+      }
+    }
+  };
+
   // Reset to default catalog
   const resetToDefaultCatalog = async () => {
     if (dbConnectionStatus === 'connected') {
@@ -296,6 +344,8 @@ export const AdminProvider = ({ children }) => {
       orders,
       recordNewOrder,
       updateOrderStatus,
+      acknowledgeCancellation,
+      resolveReturn,
       resetToDefaultCatalog,
       dbConnectionStatus,
       dbDetails,

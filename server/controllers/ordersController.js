@@ -19,6 +19,8 @@ export const formatOrderRow = (o) => ({
   deliveredAt: o.delivered_at,
   cancelReason: o.cancel_reason,
   cancelledAt: o.cancelled_at,
+  cancelAcknowledged: Boolean(o.cancel_acknowledged),
+  cancelAcknowledgedAt: o.cancel_acknowledged_at,
   returnReason: o.return_reason,
   returnComments: o.return_comments,
   returnRequestedAt: o.return_requested_at,
@@ -324,19 +326,21 @@ export const cancelOrder = async (req, res) => {
       });
     }
 
-    // 1. Update order status to Cancelled
+    // 1. Update order status to Cancelled (unacknowledged by admin initially)
     const updateRes = await client.query(`
       UPDATE orders SET
         status = 'Cancelled',
         cancel_reason = $1,
         cancelled_at = CURRENT_TIMESTAMP,
+        cancel_acknowledged = FALSE,
+        cancel_acknowledged_at = NULL,
         updated_at = CURRENT_TIMESTAMP
       WHERE id = $2
       RETURNING *;
     `, [reason || 'Cancelled by customer', id]);
 
     // 2. Restore stock for each item in the order
-    const itemsRes = await client.query('SELECT product_id, quantity FROM order_items WHERE order_id = $1;', [id]);
+    const itemsRes = await client.query('SELECT * FROM order_items WHERE order_id = $1;', [id]);
     for (const item of itemsRes.rows) {
       if (item.product_id) {
         await client.query(`
@@ -353,7 +357,10 @@ export const cancelOrder = async (req, res) => {
     res.json({
       success: true,
       message: 'Order successfully cancelled. Product stock has been restored.',
-      data: formatOrderRow(updateRes.rows[0])
+      data: formatOrderRow({
+        ...updateRes.rows[0],
+        items: itemsRes.rows
+      })
     });
   } catch (error) {
     await client.query('ROLLBACK');
@@ -361,6 +368,83 @@ export const cancelOrder = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   } finally {
     client.release();
+  }
+};
+
+/**
+ * Acknowledge a customer-cancelled order (Admin action)
+ */
+export const acknowledgeCancelOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await query(`
+      UPDATE orders SET
+        cancel_acknowledged = TRUE,
+        cancel_acknowledged_at = CURRENT_TIMESTAMP,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = $1
+      RETURNING *;
+    `, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    const itemsRes = await query('SELECT * FROM order_items WHERE order_id = $1;', [id]);
+
+    res.json({
+      success: true,
+      message: `Order ${id} cancellation acknowledged by Admin`,
+      data: formatOrderRow({
+        ...result.rows[0],
+        items: itemsRes.rows
+      })
+    });
+  } catch (error) {
+    console.error('Error acknowledging cancelled order:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * Resolve a customer return request (Admin action: Approve or Reject)
+ */
+export const resolveReturnOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { action } = req.body; // 'Approve' | 'Reject'
+
+    const isApprove = action === 'Approve';
+    const newStatus = isApprove ? 'Returned' : 'Delivered';
+    const newReturnStatus = isApprove ? 'Approved' : 'Rejected';
+
+    const result = await query(`
+      UPDATE orders SET
+        status = $1,
+        return_status = $2,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = $3
+      RETURNING *;
+    `, [newStatus, newReturnStatus, id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    const itemsRes = await query('SELECT * FROM order_items WHERE order_id = $1;', [id]);
+
+    res.json({
+      success: true,
+      message: `Return request ${newReturnStatus.toLowerCase()} by Admin`,
+      data: formatOrderRow({
+        ...result.rows[0],
+        items: itemsRes.rows
+      })
+    });
+  } catch (error) {
+    console.error('Error resolving return order:', error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 

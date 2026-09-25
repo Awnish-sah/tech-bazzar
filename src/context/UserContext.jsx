@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { loadFromStorage, saveToStorage } from '../utils/storage';
 import { api } from '../services/api';
+import { useAdmin } from './AdminContext';
 
 const UserContext = createContext();
 
@@ -8,6 +9,7 @@ const STORAGE_KEY_USER = 'techbazzar_user_session_v1';
 const STORAGE_KEY_TOKEN = 'techbazzar_user_token_v1';
 
 export const UserProvider = ({ children }) => {
+  const { refreshFromDb } = useAdmin();
   // User state: initializes to null unless explicitly logged in
   const [user, setUser] = useState(() => {
     return loadFromStorage(STORAGE_KEY_USER, null);
@@ -302,6 +304,7 @@ export const UserProvider = ({ children }) => {
       const res = await api.cancelOrder(orderId, { reason });
       if (res.success) {
         await fetchOrders();
+        if (refreshFromDb) refreshFromDb();
         return { success: true, message: res.message || 'Order cancelled and inventory restocked' };
       }
       throw new Error(res.message || 'Cancellation rejected');
@@ -321,6 +324,7 @@ export const UserProvider = ({ children }) => {
       const res = await api.returnOrder(orderId, { reason, comments });
       if (res.success) {
         await fetchOrders();
+        if (refreshFromDb) refreshFromDb();
         return { success: true, message: res.message || 'Return request submitted' };
       }
       throw new Error(res.message || 'Return request failed');
