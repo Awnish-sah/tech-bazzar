@@ -80,6 +80,19 @@ export const UserProvider = ({ children }) => {
     }
   }, [user?.id]);
 
+  /**
+   * Immediately record or update an order in userOrders state
+   */
+  const recordUserOrder = useCallback((order) => {
+    setUserOrders(prev => {
+      const exists = prev.find(o => o.id === order.id);
+      if (exists) {
+        return prev.map(o => o.id === order.id ? order : o);
+      }
+      return [order, ...prev];
+    });
+  }, []);
+
   // Load orders and addresses from DB when user logs in
   useEffect(() => {
     if (user?.id) {
@@ -418,6 +431,7 @@ export const UserProvider = ({ children }) => {
       deleteAddress,
       setDefaultAddress,
       fetchOrders,
+      recordUserOrder,
       cancelOrder,
       returnOrder,
       submitReview

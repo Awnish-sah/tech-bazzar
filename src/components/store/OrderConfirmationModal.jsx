@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
 import { useShop } from '../../context/ShopContext';
+import { useUser } from '../../context/UserContext';
 import { formatPrice } from '../../utils/formatters';
 import confetti from 'canvas-confetti';
 import {
@@ -21,6 +21,8 @@ export const OrderConfirmationModal = () => {
     currency,
     addToast
   } = useShop();
+
+  const { user, openDashboard } = useUser();
 
   useEffect(() => {
     if (isOrderConfirmationOpen) {
@@ -135,9 +137,22 @@ export const OrderConfirmationModal = () => {
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 pt-2">
+          {user && (
+            <button
+              onClick={() => {
+                setIsOrderConfirmationOpen(false);
+                if (openDashboard) openDashboard('orders');
+              }}
+              className="flex-1 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <Package className="w-4 h-4" />
+              <span>Track in My Orders</span>
+            </button>
+          )}
+
           <button
             onClick={handleDownloadInvoice}
-            className="flex-1 py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 text-xs font-semibold border border-slate-300 dark:border-slate-700 flex items-center justify-center gap-2 transition-colors"
+            className="flex-1 py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 text-xs font-semibold border border-slate-300 dark:border-slate-700 flex items-center justify-center gap-2 transition-colors cursor-pointer"
           >
             <Download className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
             <span>Download Invoice</span>
@@ -145,7 +160,7 @@ export const OrderConfirmationModal = () => {
 
           <button
             onClick={() => setIsOrderConfirmationOpen(false)}
-            className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold shadow-md dark:shadow-glow-cyan flex items-center justify-center gap-2 transition-all"
+            className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold shadow-md dark:shadow-glow-cyan flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
             <span>Continue Shopping</span>
             <ArrowRight className="w-4 h-4" />

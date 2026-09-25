@@ -104,6 +104,13 @@ export const UserDashboard = () => {
     }
   }, [user]);
 
+  // Refresh orders whenever the user dashboard modal opens
+  useEffect(() => {
+    if (activeModal === 'dashboard' && user?.id) {
+      fetchOrders();
+    }
+  }, [activeModal, user?.id, fetchOrders]);
+
   if (activeModal !== 'dashboard' || !user) return null;
 
   // Filter Orders

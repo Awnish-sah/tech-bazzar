@@ -13,7 +13,7 @@ const STORAGE_KEY_CURRENCY = 'techbazzar_currency_v1';
 
 export const ShopProvider = ({ children }) => {
   const { products, recordNewOrder } = useAdmin();
-  const { user, fetchOrders, openAuth } = useUser();
+  const { user, fetchOrders, recordUserOrder, openAuth } = useUser();
 
   // Active user ref to avoid overwriting stored cart during auth transitions
   const activeUserIdRef = React.useRef(user?.id);
@@ -244,23 +244,31 @@ export const ShopProvider = ({ children }) => {
       status: 'Processing'
     };
 
-    recordNewOrder(newOrder);
-    setLastPlacedOrder(newOrder);
+    let placedOrder = newOrder;
+    try {
+      const res = await api.createOrder(newOrder);
+      if (res && res.success && res.data) {
+        placedOrder = res.data;
+      }
+    } catch (err) {
+      console.warn('Order database insertion warning:', err.message);
+    }
+
+    // Immediately record to admin and user contexts so user sees order with zero delay
+    recordNewOrder(placedOrder);
+    if (recordUserOrder) {
+      recordUserOrder(placedOrder);
+    }
+    if (user?.id && fetchOrders) {
+      fetchOrders();
+    }
+
+    setLastPlacedOrder(placedOrder);
     clearCart();
     setAppliedCoupon(null);
     setIsCheckoutOpen(false);
     setIsOrderConfirmationOpen(true);
     addToast('🎉 Order placed successfully!', 'success');
-
-    // Persist to PostgreSQL database asynchronously
-    try {
-      await api.createOrder(newOrder);
-      if (user?.id && fetchOrders) {
-        fetchOrders();
-      }
-    } catch (err) {
-      console.warn('Order saved locally (PostgreSQL sync offline):', err.message);
-    }
   };
 
   return (

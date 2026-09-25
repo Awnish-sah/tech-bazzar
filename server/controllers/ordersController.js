@@ -112,7 +112,7 @@ export const getUserOrders = async (req, res) => {
         ) AS items
       FROM orders o
       LEFT JOIN order_items oi ON o.id = oi.order_id
-      WHERE (o.user_id = $1 OR o.customer_email = (SELECT email FROM users WHERE id = $1 LIMIT 1))
+      WHERE (o.user_id = $1 OR LOWER(TRIM(o.customer_email)) = (SELECT LOWER(TRIM(email)) FROM users WHERE id = $1 LIMIT 1))
     `;
 
     const params = [uid];

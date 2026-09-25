@@ -37,7 +37,16 @@ async function initDatabase() {
     console.log('🌱 Executing seed.sql (Populating default products, users, addresses & reviews)...');
     const seedSql = fs.readFileSync(path.join(__dirname, 'seed.sql'), 'utf8');
     await pool.query(seedSql);
-    console.log('✅ Seed data inserted successfully.');
+
+    // 2b. Ensure schema migrations & sequence values are in sync
+    await pool.query('ALTER TABLE customers ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users(id) ON DELETE SET NULL;');
+    await pool.query('DELETE FROM order_items a USING order_items b WHERE a.id > b.id AND a.order_id = b.order_id AND a.product_id = b.product_id;');
+    await pool.query("SELECT setval('customers_id_seq', COALESCE((SELECT MAX(id) FROM customers), 1));");
+    await pool.query("SELECT setval('users_id_seq', COALESCE((SELECT MAX(id) FROM users), 1));");
+    await pool.query("SELECT setval('addresses_id_seq', COALESCE((SELECT MAX(id) FROM addresses), 1));");
+    await pool.query("SELECT setval('reviews_id_seq', COALESCE((SELECT MAX(id) FROM reviews), 1));");
+    await pool.query("SELECT setval('order_items_id_seq', COALESCE((SELECT MAX(id) FROM order_items), 1));");
+    console.log('✅ Seed data & sequences synchronized successfully.');
 
     // 3. Verify counts
     const productsRes = await pool.query('SELECT COUNT(*) FROM products;');
