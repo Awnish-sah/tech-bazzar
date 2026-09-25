@@ -13,17 +13,27 @@ const STORAGE_KEY_CURRENCY = 'techbazzar_currency_v1';
 
 export const ShopProvider = ({ children }) => {
   const { products, recordNewOrder } = useAdmin();
-  const { user, fetchOrders } = useUser();
+  const { user, fetchOrders, openAuth } = useUser();
 
-  // Cart state
+  // Cart state - active only when signed in
   const [cart, setCart] = useState(() => {
-    return loadFromStorage(STORAGE_KEY_CART, []);
+    return user ? loadFromStorage(STORAGE_KEY_CART, []) : [];
   });
 
-  // Wishlist state
+  // Wishlist state - active only when signed in
   const [wishlist, setWishlist] = useState(() => {
-    return loadFromStorage(STORAGE_KEY_WISHLIST, ['prod-1', 'prod-3']);
+    return user ? loadFromStorage(STORAGE_KEY_WISHLIST, []) : [];
   });
+
+  // Reset cart & wishlist immediately upon logout
+  useEffect(() => {
+    if (!user) {
+      setCart([]);
+      setWishlist([]);
+      localStorage.removeItem(STORAGE_KEY_CART);
+      localStorage.removeItem(STORAGE_KEY_WISHLIST);
+    }
+  }, [user]);
 
   // Currency
   const [currency, setCurrency] = useState(() => {
@@ -63,24 +73,34 @@ export const ShopProvider = ({ children }) => {
     setToasts(prev => prev.filter(t => t.id !== id));
   };
 
-  // Sync cart & wishlist
+  // Sync cart & wishlist when user is authenticated
   useEffect(() => {
-    saveToStorage(STORAGE_KEY_CART, cart);
-  }, [cart]);
+    if (user) {
+      saveToStorage(STORAGE_KEY_CART, cart);
+    }
+  }, [cart, user]);
 
   useEffect(() => {
-    saveToStorage(STORAGE_KEY_WISHLIST, wishlist);
-  }, [wishlist]);
+    if (user) {
+      saveToStorage(STORAGE_KEY_WISHLIST, wishlist);
+    }
+  }, [wishlist, user]);
 
   useEffect(() => {
     saveToStorage(STORAGE_KEY_CURRENCY, currency);
   }, [currency]);
 
-  // Add to cart
+  // Add to cart with auth verification
   const addToCart = (product, quantity = 1) => {
+    if (!user) {
+      addToast('🔒 Please sign in to add products to your cart!', 'info');
+      if (openAuth) openAuth('login');
+      return false;
+    }
+
     if (product.stock <= 0) {
       addToast('Sorry, this product is currently out of stock!', 'error');
-      return;
+      return false;
     }
 
     setCart(prev => {
@@ -95,6 +115,7 @@ export const ShopProvider = ({ children }) => {
     });
 
     addToast(`Added "${product.name.slice(0, 30)}..." to your cart!`, 'success');
+    return true;
   };
 
   // Remove from cart
@@ -125,8 +146,14 @@ export const ShopProvider = ({ children }) => {
     setCart([]);
   };
 
-  // Wishlist toggle
+  // Wishlist toggle with auth verification
   const toggleWishlist = (productId) => {
+    if (!user) {
+      addToast('🔒 Please sign in to save products to your wishlist!', 'info');
+      if (openAuth) openAuth('login');
+      return false;
+    }
+
     setWishlist(prev => {
       const exists = prev.includes(productId);
       if (exists) {
@@ -137,9 +164,10 @@ export const ShopProvider = ({ children }) => {
         return [...prev, productId];
       }
     });
+    return true;
   };
 
-  const isInWishlist = (productId) => wishlist.includes(productId);
+  const isInWishlist = (productId) => Boolean(user && wishlist.includes(productId));
 
   // Apply Coupon
   const applyCoupon = (code) => {

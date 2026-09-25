@@ -86,9 +86,11 @@ export const ProductQuickView = () => {
   };
 
   const handleBuyNow = () => {
-    addToCart(product, quantity);
-    setQuickViewProduct(null);
-    setIsCheckoutOpen(true);
+    const success = addToCart(product, quantity);
+    if (success) {
+      setQuickViewProduct(null);
+      setIsCheckoutOpen(true);
+    }
   };
 
   const handleReviewSubmit = async (e) => {
@@ -336,8 +338,10 @@ export const ProductQuickView = () => {
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => {
-                      addToCart(product, quantity);
-                      setQuickViewProduct(null);
+                      const success = addToCart(product, quantity);
+                      if (success) {
+                        setQuickViewProduct(null);
+                      }
                     }}
                     disabled={isOutOfStock}
                     className="py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 transition-colors disabled:opacity-50"

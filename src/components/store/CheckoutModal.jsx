@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { useShop } from '../../context/ShopContext';
 import { useUser } from '../../context/UserContext';
 import { formatPrice } from '../../utils/formatters';

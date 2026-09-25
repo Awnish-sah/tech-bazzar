@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { useShop } from '../../context/ShopContext';
 import { useAdmin } from '../../context/AdminContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -280,6 +279,10 @@ export const Navbar = ({ onOpenAdmin, onViewMode, currentView }) => {
             {/* Wishlist */}
             <button
               onClick={() => {
+                if (!user) {
+                  openAuth('login');
+                  return;
+                }
                 onViewMode('store');
                 const wishlistElem = document.getElementById('catalog-section');
                 if (wishlistElem) wishlistElem.scrollIntoView({ behavior: 'smooth' });
@@ -288,7 +291,7 @@ export const Navbar = ({ onOpenAdmin, onViewMode, currentView }) => {
               title="Wishlist"
             >
               <Heart className="w-4 h-4" />
-              {wishlist.length > 0 && (
+              {user && wishlist.length > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center shadow-lg">
                   {wishlist.length}
                 </span>
@@ -297,19 +300,25 @@ export const Navbar = ({ onOpenAdmin, onViewMode, currentView }) => {
 
             {/* Cart Trigger */}
             <button
-              onClick={() => setIsCartOpen(true)}
+              onClick={() => {
+                if (!user) {
+                  openAuth('login');
+                } else {
+                  setIsCartOpen(true);
+                }
+              }}
               className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold text-xs sm:text-sm shadow-md dark:shadow-glow-cyan transition-all transform active:scale-95"
             >
               <div className="relative">
                 <ShoppingCart className="w-4 h-4" />
-                {cartCount > 0 && (
+                {user && cartCount > 0 && (
                   <span className="absolute -top-2 -right-2 bg-rose-500 text-white font-bold text-[10px] w-4 h-4 rounded-full flex items-center justify-center border border-white dark:border-[#0A0E1A]">
                     {cartCount}
                   </span>
                 )}
               </div>
               <span className="hidden md:inline font-mono">
-                {cartCount > 0 ? formatPrice(cartSubtotal, currency) : 'Cart'}
+                {user && cartCount > 0 ? formatPrice(cartSubtotal, currency) : 'Cart'}
               </span>
             </button>
 

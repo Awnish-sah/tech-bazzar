@@ -73,7 +73,7 @@ export const AdminProvider = ({ children }) => {
   });
 
   const [orders, setOrders] = useState(() => {
-    return loadFromStorage(STORAGE_KEY_ORDERS, INITIAL_ORDERS);
+    return loadFromStorage(STORAGE_KEY_ORDERS, []);
   });
 
   // DB Connection status: 'checking', 'connected', 'fallback'
@@ -111,11 +111,11 @@ export const AdminProvider = ({ children }) => {
           api.getOrders().catch(() => null)
         ]);
 
-        if (prodRes && prodRes.data && prodRes.data.length > 0) {
+        if (prodRes && Array.isArray(prodRes.data)) {
           setProducts(prodRes.data);
         }
 
-        if (orderRes && orderRes.data && orderRes.data.length > 0) {
+        if (orderRes && Array.isArray(orderRes.data)) {
           setOrders(orderRes.data);
         }
       } else {
