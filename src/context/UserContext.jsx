@@ -183,8 +183,6 @@ export const UserProvider = ({ children }) => {
     localStorage.removeItem(STORAGE_KEY_TOKEN);
     localStorage.removeItem('techbazzar_user_addresses_v1');
     localStorage.removeItem('techbazzar_user_orders_v1');
-    localStorage.removeItem('techbazzar_cart_v1');
-    localStorage.removeItem('techbazzar_wishlist_v1');
     closeModal();
   };
 

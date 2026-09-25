@@ -257,6 +257,39 @@ export const api = {
   },
 
   /**
+   * Hero Banners Endpoints
+   */
+  getBanners: async ({ all = false } = {}) => {
+    return request(`/banners${all ? '?all=true' : ''}`);
+  },
+
+  createBanner: async (bannerData) => {
+    return request('/banners', {
+      method: 'POST',
+      body: JSON.stringify(bannerData)
+    });
+  },
+
+  updateBanner: async (id, bannerData) => {
+    return request(`/banners/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(bannerData)
+    });
+  },
+
+  deleteBanner: async (id) => {
+    return request(`/banners/${id}`, {
+      method: 'DELETE'
+    });
+  },
+
+  toggleBannerActive: async (id) => {
+    return request(`/banners/${id}/active`, {
+      method: 'PATCH'
+    });
+  },
+
+  /**
    * Admin Endpoints
    */
   adminLogin: async (email, password) => {

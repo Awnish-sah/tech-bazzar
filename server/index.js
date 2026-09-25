@@ -10,6 +10,7 @@ import adminRoutes from './routes/adminRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import addressRoutes from './routes/addressRoutes.js';
 import reviewsRoutes from './routes/reviewsRoutes.js';
+import heroBannerRoutes from './routes/heroBannerRoutes.js';
 import { checkConnection } from './config/db.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -46,6 +47,7 @@ app.get('/api/health', async (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/users/addresses', addressRoutes);
 app.use('/api/reviews', reviewsRoutes);
+app.use('/api/banners', heroBannerRoutes);
 app.use('/api/products', productsRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/admin', adminRoutes);

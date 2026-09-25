@@ -582,3 +582,51 @@ ON CONFLICT DO NOTHING;
 INSERT INTO admin_users (email, password_hash, role) VALUES
 ('admin@techbazzar.com', 'admin123', 'admin')
 ON CONFLICT (email) DO NOTHING;
+
+-- 10. Insert Default Hero Banners
+INSERT INTO hero_banners (
+    title, subtitle, tagline, price, original_price, badge, image, accent_color, link, specs, display_order, is_active
+) VALUES
+(
+    'MacBook Pro 16"',
+    'Next-Generation Apple Silicon',
+    'Turbocharged by M3 Max with up to 128GB unified memory and liquid retina XDR.',
+    3199.00,
+    3499.00,
+    'Flagship Performance',
+    'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1200&q=80',
+    'from-cyan-500 to-blue-600',
+    '#catalog-section',
+    '["16-Core CPU", "40-Core GPU", "22h Battery", "Liquid Retina XDR"]'::jsonb,
+    1,
+    TRUE
+),
+(
+    'iPhone 16 Pro',
+    'Forged in Grade 5 Titanium',
+    'A18 Pro power, 4K 120fps Dolby Vision, and dedicated Camera Control.',
+    999.00,
+    1099.00,
+    'Exclusive Launch Offer',
+    'https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=1200&q=80',
+    'from-purple-500 to-indigo-600',
+    '#catalog-section',
+    '["A18 Pro Chip", "48MP Fusion Camera", "Titanium Frame", "Camera Control"]'::jsonb,
+    2,
+    TRUE
+),
+(
+    'Sony WH-1000XM5',
+    'Pure Audio Perfection',
+    'Industry-leading noise canceling with Dual Processor V1 and 8 microphones.',
+    329.00,
+    399.00,
+    'Best Audio 2026',
+    'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80',
+    'from-emerald-500 to-teal-600',
+    '#catalog-section',
+    '["Dual Processor V1", "30hr Battery Life", "Hi-Res Audio LDAC", "Speak-to-Chat"]'::jsonb,
+    3,
+    TRUE
+);
+

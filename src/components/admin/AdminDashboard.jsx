@@ -4,6 +4,7 @@ import { useShop } from '../../context/ShopContext';
 import { formatPrice } from '../../utils/formatters';
 import { AdminProductList } from './AdminProductList';
 import { AdminOrdersList } from './AdminOrdersList';
+import { AdminHeroBannerManager } from './AdminHeroBannerManager';
 import { AdminAddProductModal } from './AdminAddProductModal';
 import { AdminEditProductModal } from './AdminEditProductModal';
 import {
@@ -186,8 +187,8 @@ export const AdminDashboard = ({ onBackToStore }) => {
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
+          <div className="flex flex-wrap items-center gap-2.5">
             <button
               onClick={() => setActiveTab('products')}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all border ${
@@ -209,6 +210,17 @@ export const AdminDashboard = ({ onBackToStore }) => {
             >
               Orders Fulfillment ({orders.length})
             </button>
+
+            <button
+              onClick={() => setActiveTab('banners')}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all border ${
+                activeTab === 'banners'
+                  ? 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border-cyan-400 dark:border-cyan-500/40 shadow-sm dark:shadow-glow-cyan'
+                  : 'bg-white dark:bg-[#11182A] text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white shadow-sm dark:shadow-none'
+              }`}
+            >
+              Hero Banners
+            </button>
           </div>
 
           {activeTab === 'products' && (
@@ -223,13 +235,19 @@ export const AdminDashboard = ({ onBackToStore }) => {
         </div>
 
         {/* Tab Content */}
-        {activeTab === 'products' ? (
+        {activeTab === 'products' && (
           <AdminProductList
             onOpenAddModal={() => setIsAddModalOpen(true)}
             onEditProduct={(prod) => setEditingProduct(prod)}
           />
-        ) : (
+        )}
+
+        {activeTab === 'orders' && (
           <AdminOrdersList />
+        )}
+
+        {activeTab === 'banners' && (
+          <AdminHeroBannerManager />
         )}
       </div>
 

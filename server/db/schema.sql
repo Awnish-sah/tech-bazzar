@@ -220,3 +220,29 @@ CREATE TRIGGER set_addresses_updated_at
     BEFORE UPDATE ON addresses
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
+
+-- 11. Hero Banners Table (Admin Managed Slides)
+CREATE TABLE IF NOT EXISTS hero_banners (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    subtitle VARCHAR(255),
+    tagline TEXT,
+    price NUMERIC(10, 2),
+    original_price NUMERIC(10, 2),
+    badge VARCHAR(100),
+    image TEXT NOT NULL,
+    accent_color VARCHAR(100) DEFAULT 'from-cyan-500 to-blue-600',
+    link VARCHAR(255) DEFAULT '#catalog-section',
+    specs JSONB DEFAULT '[]'::jsonb,
+    display_order INTEGER DEFAULT 0,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+DROP TRIGGER IF EXISTS set_hero_banners_updated_at ON hero_banners;
+CREATE TRIGGER set_hero_banners_updated_at
+    BEFORE UPDATE ON hero_banners
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+

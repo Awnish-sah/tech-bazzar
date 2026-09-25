@@ -1,19 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useShop } from '../../context/ShopContext';
 import { formatPrice } from '../../utils/formatters';
+import { api } from '../../services/api';
 import {
   ArrowRight,
   ChevronLeft,
   ChevronRight,
-  Sparkles,
-  Zap,
-  Shield,
-  Truck,
-  Flame,
-  Star
+  Sparkles
 } from 'lucide-react';
 
-const HERO_SLIDES = [
+const DEFAULT_SLIDES = [
   {
     id: 'prod-1',
     subtitle: 'Next-Generation Apple Silicon',
@@ -53,26 +49,65 @@ const HERO_SLIDES = [
 ];
 
 export const HeroBanner = () => {
+  const [slides, setSlides] = useState(DEFAULT_SLIDES);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { currency, addToCart, setQuickViewProduct } = useShop();
+  const { currency } = useShop();
+
+  const fetchBanners = useCallback(async () => {
+    try {
+      const res = await api.getBanners(false);
+      if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+        setSlides(res.data);
+      }
+    } catch (err) {
+      console.warn('Using default hero banners (API offline or error):', err.message);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchBanners();
+
+    // Listen to banner update events triggered by Admin panel
+    const handleBannersUpdated = () => {
+      fetchBanners();
+    };
+    window.addEventListener('techbazzar:banners-updated', handleBannersUpdated);
+    return () => {
+      window.removeEventListener('techbazzar:banners-updated', handleBannersUpdated);
+    };
+  }, [fetchBanners]);
+
+  // Clamp currentSlide if slides count changes
+  useEffect(() => {
+    if (currentSlide >= slides.length) {
+      setCurrentSlide(0);
+    }
+  }, [slides.length, currentSlide]);
 
   // Auto slide rotation
   useEffect(() => {
+    if (slides.length <= 1) return;
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 6000);
     return () => clearInterval(timer);
-  }, []);
+  }, [slides.length]);
 
-  const slide = HERO_SLIDES[currentSlide];
+  if (!slides || slides.length === 0) return null;
+
+  const slide = slides[currentSlide] || slides[0];
 
   const handlePrev = () => {
-    setCurrentSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
   const handleNext = () => {
-    setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
   };
+
+  const specsList = Array.isArray(slide.specs)
+    ? slide.specs
+    : (typeof slide.specs === 'string' ? JSON.parse(slide.specs || '[]') : []);
 
   return (
     <div className="relative max-w-7xl mx-auto px-4 lg:px-8 pt-6 pb-4">
@@ -90,36 +125,44 @@ export const HeroBanner = () => {
           <div className="lg:col-span-7 space-y-5 text-left">
             
             {/* Promo Tag */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-700 dark:text-cyan-300 text-xs font-semibold backdrop-blur-md">
-              <Sparkles className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
-              <span>{slide.badge}</span>
-            </div>
+            {slide.badge && (
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-700 dark:text-cyan-300 text-xs font-semibold backdrop-blur-md">
+                <Sparkles className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
+                <span>{slide.badge}</span>
+              </div>
+            )}
 
             {/* Subtitle & Title */}
             <div>
-              <p className="text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 font-semibold mb-1">
-                {slide.subtitle}
-              </p>
+              {slide.subtitle && (
+                <p className="text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 font-semibold mb-1">
+                  {slide.subtitle}
+                </p>
+              )}
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
                 {slide.title}
               </h1>
             </div>
 
-            <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base max-w-lg leading-relaxed">
-              {slide.tagline}
-            </p>
+            {slide.tagline && (
+              <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base max-w-lg leading-relaxed">
+                {slide.tagline}
+              </p>
+            )}
 
             {/* Key Specs Pills */}
-            <div className="flex flex-wrap gap-2 pt-1">
-              {slide.specs.map((spec, i) => (
-                <span
-                  key={i}
-                  className="px-2.5 py-1 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-300 text-xs font-medium shadow-sm dark:shadow-none"
-                >
-                  {spec}
-                </span>
-              ))}
-            </div>
+            {specsList.length > 0 && (
+              <div className="flex flex-wrap gap-2 pt-1">
+                {specsList.map((spec, i) => (
+                  <span
+                    key={i}
+                    className="px-2.5 py-1 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-300 text-xs font-medium shadow-sm dark:shadow-none"
+                  >
+                    {spec}
+                  </span>
+                ))}
+              </div>
+            )}
 
             {/* Pricing & CTA */}
             <div className="pt-2 flex flex-wrap items-center gap-4 sm:gap-6">
@@ -127,14 +170,16 @@ export const HeroBanner = () => {
                 <span className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white font-mono">
                   {formatPrice(slide.price, currency)}
                 </span>
-                <span className="text-base text-slate-400 dark:text-slate-500 line-through font-mono">
-                  {formatPrice(slide.originalPrice, currency)}
-                </span>
+                {slide.originalPrice && (
+                  <span className="text-base text-slate-400 dark:text-slate-500 line-through font-mono">
+                    {formatPrice(slide.originalPrice, currency)}
+                  </span>
+                )}
               </div>
 
               <div className="flex items-center gap-3">
                 <a
-                  href="#catalog-section"
+                  href={slide.link || "#catalog-section"}
                   className="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold text-sm shadow-md hover:shadow-cyan-500/20 dark:shadow-glow-cyan flex items-center gap-2 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
                 >
                   <span>Explore Catalog</span>
@@ -142,6 +187,7 @@ export const HeroBanner = () => {
                 </a>
 
                 <button
+                  type="button"
                   onClick={() => {
                     const el = document.getElementById('catalog-section');
                     if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -174,35 +220,41 @@ export const HeroBanner = () => {
         </div>
 
         {/* Slide Controls */}
-        <div className="absolute bottom-4 right-6 flex items-center gap-2 z-20">
-          <button
-            onClick={handlePrev}
-            className="p-2 rounded-full bg-white/80 hover:bg-white text-slate-700 dark:bg-white/5 dark:hover:bg-white/10 dark:text-slate-300 border border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none transition-colors"
-            title="Previous slide"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
+        {slides.length > 1 && (
+          <div className="absolute bottom-4 right-6 flex items-center gap-2 z-20">
+            <button
+              type="button"
+              onClick={handlePrev}
+              className="p-2 rounded-full bg-white/80 hover:bg-white text-slate-700 dark:bg-white/5 dark:hover:bg-white/10 dark:text-slate-300 border border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none transition-colors"
+              title="Previous slide"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
 
-          <div className="flex gap-1.5 mx-1">
-            {HERO_SLIDES.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setCurrentSlide(idx)}
-                className={`h-2 rounded-full transition-all ${
-                  currentSlide === idx ? 'w-6 bg-cyan-500' : 'w-2 bg-slate-300 dark:bg-slate-600'
-                }`}
-              />
-            ))}
+            <div className="flex gap-1.5 mx-1">
+              {slides.map((_, idx) => (
+                <button
+                  type="button"
+                  key={idx}
+                  onClick={() => setCurrentSlide(idx)}
+                  className={`h-2 rounded-full transition-all ${
+                    currentSlide === idx ? 'w-6 bg-cyan-500' : 'w-2 bg-slate-300 dark:bg-slate-600'
+                  }`}
+                  title={`Slide ${idx + 1}`}
+                />
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={handleNext}
+              className="p-2 rounded-full bg-white/80 hover:bg-white text-slate-700 dark:bg-white/5 dark:hover:bg-white/10 dark:text-slate-300 border border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none transition-colors"
+              title="Next slide"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
-
-          <button
-            onClick={handleNext}
-            className="p-2 rounded-full bg-white/80 hover:bg-white text-slate-700 dark:bg-white/5 dark:hover:bg-white/10 dark:text-slate-300 border border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none transition-colors"
-            title="Next slide"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
+        )}
       </div>
     </div>
   );

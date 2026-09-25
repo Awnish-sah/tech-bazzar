@@ -46,14 +46,16 @@ async function initDatabase() {
     const usersRes = await pool.query('SELECT COUNT(*) FROM users;');
     const addressesRes = await pool.query('SELECT COUNT(*) FROM addresses;');
     const reviewsRes = await pool.query('SELECT COUNT(*) FROM reviews;');
+    const bannersRes = await pool.query('SELECT COUNT(*) FROM hero_banners;');
 
     console.log('\n📊 Database Status Summary:');
-    console.log(`   - Categories: ${categoriesRes.rows[0].count}`);
-    console.log(`   - Products:   ${productsRes.rows[0].count}`);
-    console.log(`   - Orders:     ${ordersRes.rows[0].count}`);
-    console.log(`   - Users:      ${usersRes.rows[0].count}`);
-    console.log(`   - Addresses:  ${addressesRes.rows[0].count}`);
-    console.log(`   - Reviews:    ${reviewsRes.rows[0].count}`);
+    console.log(`   - Categories:   ${categoriesRes.rows[0].count}`);
+    console.log(`   - Products:     ${productsRes.rows[0].count}`);
+    console.log(`   - Hero Banners: ${bannersRes.rows[0].count}`);
+    console.log(`   - Orders:       ${ordersRes.rows[0].count}`);
+    console.log(`   - Users:        ${usersRes.rows[0].count}`);
+    console.log(`   - Addresses:    ${addressesRes.rows[0].count}`);
+    console.log(`   - Reviews:      ${reviewsRes.rows[0].count}`);
     console.log('\n🎉 TechBazzar PostgreSQL database is fully initialized and ready!\n');
 
     process.exit(0);

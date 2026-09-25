@@ -7,33 +7,44 @@ import { api } from '../services/api';
 
 const ShopContext = createContext();
 
-const STORAGE_KEY_CART = 'techbazzar_cart_v1';
-const STORAGE_KEY_WISHLIST = 'techbazzar_wishlist_v1';
+const getUserCartKey = (userId) => `techbazzar_cart_user_${userId}`;
+const getUserWishlistKey = (userId) => `techbazzar_wishlist_user_${userId}`;
 const STORAGE_KEY_CURRENCY = 'techbazzar_currency_v1';
 
 export const ShopProvider = ({ children }) => {
   const { products, recordNewOrder } = useAdmin();
   const { user, fetchOrders, openAuth } = useUser();
 
-  // Cart state - active only when signed in
+  // Active user ref to avoid overwriting stored cart during auth transitions
+  const activeUserIdRef = React.useRef(user?.id);
+
+  // Cart state - loaded for the authenticated user
   const [cart, setCart] = useState(() => {
-    return user ? loadFromStorage(STORAGE_KEY_CART, []) : [];
+    return user?.id ? loadFromStorage(getUserCartKey(user.id), []) : [];
   });
 
-  // Wishlist state - active only when signed in
+  // Wishlist state - loaded for the authenticated user
   const [wishlist, setWishlist] = useState(() => {
-    return user ? loadFromStorage(STORAGE_KEY_WISHLIST, []) : [];
+    return user?.id ? loadFromStorage(getUserWishlistKey(user.id), []) : [];
   });
 
-  // Reset cart & wishlist immediately upon logout
+  // Handle user authentication switch / login / logout
   useEffect(() => {
-    if (!user) {
-      setCart([]);
-      setWishlist([]);
-      localStorage.removeItem(STORAGE_KEY_CART);
-      localStorage.removeItem(STORAGE_KEY_WISHLIST);
+    const currentId = user?.id;
+    if (currentId !== activeUserIdRef.current) {
+      activeUserIdRef.current = currentId;
+      if (currentId) {
+        const savedCart = loadFromStorage(getUserCartKey(currentId), []);
+        const savedWishlist = loadFromStorage(getUserWishlistKey(currentId), []);
+        setCart(savedCart);
+        setWishlist(savedWishlist);
+      } else {
+        // Logout: reset in-memory state so header badge is 0, but preserve user's saved data in storage
+        setCart([]);
+        setWishlist([]);
+      }
     }
-  }, [user]);
+  }, [user?.id]);
 
   // Currency
   const [currency, setCurrency] = useState(() => {
@@ -75,16 +86,16 @@ export const ShopProvider = ({ children }) => {
 
   // Sync cart & wishlist when user is authenticated
   useEffect(() => {
-    if (user) {
-      saveToStorage(STORAGE_KEY_CART, cart);
+    if (user?.id && activeUserIdRef.current === user.id) {
+      saveToStorage(getUserCartKey(user.id), cart);
     }
-  }, [cart, user]);
+  }, [cart, user?.id]);
 
   useEffect(() => {
-    if (user) {
-      saveToStorage(STORAGE_KEY_WISHLIST, wishlist);
+    if (user?.id && activeUserIdRef.current === user.id) {
+      saveToStorage(getUserWishlistKey(user.id), wishlist);
     }
-  }, [wishlist, user]);
+  }, [wishlist, user?.id]);
 
   useEffect(() => {
     saveToStorage(STORAGE_KEY_CURRENCY, currency);
@@ -144,6 +155,9 @@ export const ShopProvider = ({ children }) => {
 
   const clearCart = () => {
     setCart([]);
+    if (user?.id) {
+      localStorage.removeItem(getUserCartKey(user.id));
+    }
   };
 
   // Wishlist toggle with auth verification
