@@ -12,7 +12,14 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 const { Pool } = pg;
 
-const connectionString = process.env.DATABASE_URL || process.env.NETLIFY_DATABASE_URL;
+const DEFAULT_NEON_URL = 'postgresql://neondb_owner:npg_mAECLdX32yqF@ep-polished-feather-b34msen7-pooler.c-4.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
+
+const rawConnectionString = process.env.DATABASE_URL || process.env.NETLIFY_DATABASE_URL || DEFAULT_NEON_URL;
+// Sanitize channel_binding=require for node-postgres compatibility with Neon Pooler
+const connectionString = rawConnectionString
+  ? rawConnectionString.replace(/([?&])channel_binding=require(&?)/gi, (match, p1, p2) => (p1 === '?' && p2 ? '?' : p2 ? p1 : ''))
+  : null;
+
 const isLocalConnection = connectionString
   ? connectionString.includes('localhost') || connectionString.includes('127.0.0.1')
   : (process.env.PGHOST || 'localhost') === 'localhost' || process.env.PGHOST === '127.0.0.1';
@@ -23,7 +30,7 @@ const poolConfig = connectionString
       ssl: !isLocalConnection ? { rejectUnauthorized: false } : false,
       max: 10,
       idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 10000
+      connectionTimeoutMillis: 15000
     }
   : {
       host: process.env.PGHOST || 'localhost',
@@ -34,7 +41,7 @@ const poolConfig = connectionString
       ssl: process.env.PGSSL === 'true' || !isLocalConnection ? { rejectUnauthorized: false } : false,
       max: 15,
       idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 8000
+      connectionTimeoutMillis: 10000
     };
 
 export const pool = new Pool(poolConfig);

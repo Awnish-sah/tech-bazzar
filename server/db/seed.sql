@@ -380,7 +380,7 @@ INSERT INTO customers (id, name, email, phone, address, city) VALUES
 (2, 'Sophia Chen', 'sophia.chen@example.com', '+1 (555) 987-6543', '120 Market Street, Suite 400', 'San Francisco')
 ON CONFLICT (id) DO NOTHING;
 
--- 4. Insert Demo Registered Users (Alex Rivera & Sophia Chen)
+-- 4. Insert Demo Registered Users (Alex Rivera, Sophia Chen, and Avanish Sah)
 INSERT INTO users (id, name, email, password_hash, phone, avatar, provider) VALUES
 (
     1,
@@ -399,9 +399,28 @@ INSERT INTO users (id, name, email, password_hash, phone, avatar, provider) VALU
     '+1 (555) 987-6543',
     'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
     'google'
+),
+(
+    3,
+    'TechBazzar Customer',
+    'customer@techbazzar.com',
+    'password123',
+    '+1 (555) 111-2222',
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+    'local'
+),
+(
+    4,
+    'Avanish Sah',
+    'avanish@gmail.com',
+    '123456',
+    '+977 9841234567',
+    'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80',
+    'local'
 )
 ON CONFLICT (id) DO UPDATE SET
     name = EXCLUDED.name,
+    email = EXCLUDED.email,
     phone = EXCLUDED.phone,
     password_hash = EXCLUDED.password_hash;
 
