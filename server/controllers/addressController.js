@@ -5,11 +5,13 @@ export const formatAddress = (row) => ({
   userId: row.user_id,
   title: row.title || 'Home',
   recipientName: row.recipient_name,
+  fullName: row.recipient_name,
   phone: row.phone,
   streetAddress: row.street_address,
   city: row.city,
-  state: row.state,
-  zipCode: row.zip_code,
+  state: row.state || '',
+  zipCode: row.zip_code || '',
+  postalCode: row.zip_code || '',
   country: row.country || 'United States',
   isDefault: Boolean(row.is_default),
   createdAt: row.created_at
@@ -46,22 +48,43 @@ export const getAddresses = async (req, res) => {
  */
 export const addAddress = async (req, res) => {
   try {
-    const { userId, title, recipientName, phone, streetAddress, city, state, zipCode, country, isDefault } = req.body;
+    const {
+      userId,
+      title,
+      recipientName,
+      fullName,
+      name,
+      phone,
+      streetAddress,
+      city,
+      state,
+      zipCode,
+      postalCode,
+      country,
+      isDefault
+    } = req.body;
 
-    if (!userId || !recipientName || !phone || !streetAddress || !city) {
-      return res.status(400).json({ success: false, message: 'Recipient name, phone, street address, and city are required' });
+    const resolvedName = (recipientName || fullName || name || '').trim();
+    const resolvedPostal = (zipCode || postalCode || '').trim();
+
+    if (!userId || !resolvedName || !phone || !streetAddress || !city) {
+      return res.status(400).json({
+        success: false,
+        message: 'Full name, phone, street address, and city are required'
+      });
     }
 
     const uid = parseInt(userId, 10);
+    let makeDefault = Boolean(isDefault);
 
     // If setting as default, unmark other defaults
-    if (isDefault) {
+    if (makeDefault) {
       await query('UPDATE addresses SET is_default = FALSE WHERE user_id = $1;', [uid]);
     } else {
-      // If user has no addresses yet, make this one default
+      // If user has no addresses yet, make this one default automatically
       const checkCount = await query('SELECT COUNT(*) FROM addresses WHERE user_id = $1;', [uid]);
       if (parseInt(checkCount.rows[0].count, 10) === 0) {
-        req.body.isDefault = true;
+        makeDefault = true;
       }
     }
 
@@ -74,14 +97,14 @@ export const addAddress = async (req, res) => {
     const result = await query(insertSql, [
       uid,
       title || 'Home',
-      recipientName.trim(),
+      resolvedName,
       phone.trim(),
       streetAddress.trim(),
       city.trim(),
-      state ? state.trim() : null,
-      zipCode ? zipCode.trim() : null,
+      state ? state.trim() : '',
+      resolvedPostal,
       country ? country.trim() : 'United States',
-      Boolean(req.body.isDefault)
+      makeDefault
     ]);
 
     res.status(201).json({
@@ -101,8 +124,24 @@ export const addAddress = async (req, res) => {
 export const updateAddress = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, recipientName, phone, streetAddress, city, state, zipCode, country, isDefault, userId } = req.body;
+    const {
+      title,
+      recipientName,
+      fullName,
+      name,
+      phone,
+      streetAddress,
+      city,
+      state,
+      zipCode,
+      postalCode,
+      country,
+      isDefault,
+      userId
+    } = req.body;
 
+    const resolvedName = recipientName || fullName || name;
+    const resolvedPostal = zipCode !== undefined ? zipCode : postalCode;
     const addressId = parseInt(id, 10);
 
     if (isDefault && userId) {
@@ -127,12 +166,12 @@ export const updateAddress = async (req, res) => {
 
     const result = await query(updateSql, [
       title || null,
-      recipientName ? recipientName.trim() : null,
+      resolvedName ? resolvedName.trim() : null,
       phone ? phone.trim() : null,
       streetAddress ? streetAddress.trim() : null,
       city ? city.trim() : null,
-      state ? state.trim() : null,
-      zipCode ? zipCode.trim() : null,
+      state !== undefined ? state.trim() : null,
+      resolvedPostal !== undefined ? resolvedPostal.trim() : null,
       country ? country.trim() : null,
       isDefault !== undefined ? Boolean(isDefault) : null,
       addressId

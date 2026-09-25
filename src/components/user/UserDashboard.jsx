@@ -104,12 +104,13 @@ export const UserDashboard = () => {
     }
   }, [user]);
 
-  // Refresh orders whenever the user dashboard modal opens
+  // Refresh orders and delivery addresses whenever the user dashboard modal opens
   useEffect(() => {
     if (activeModal === 'dashboard' && user?.id) {
       fetchOrders();
+      fetchAddresses(user.id);
     }
-  }, [activeModal, user?.id, fetchOrders]);
+  }, [activeModal, user?.id, fetchOrders, fetchAddresses]);
 
   if (activeModal !== 'dashboard' || !user) return null;
 
@@ -162,12 +163,12 @@ export const UserDashboard = () => {
     setEditingAddressId(addr.id);
     setAddressFormData({
       title: addr.title || 'Home',
-      fullName: addr.fullName || '',
+      fullName: addr.fullName || addr.recipientName || '',
       phone: addr.phone || '',
       streetAddress: addr.streetAddress || '',
       city: addr.city || '',
       state: addr.state || '',
-      postalCode: addr.postalCode || '',
+      postalCode: addr.postalCode || addr.zipCode || '',
       country: addr.country || 'United States',
       isDefault: Boolean(addr.isDefault)
     });
@@ -181,6 +182,7 @@ export const UserDashboard = () => {
     } else {
       await addAddress(addressFormData);
     }
+    await fetchAddresses(user.id);
     setIsAddressFormOpen(false);
   };
 
@@ -546,10 +548,10 @@ export const UserDashboard = () => {
                     </div>
 
                     <div className="text-xs space-y-1 text-slate-600 dark:text-slate-300">
-                      <p className="font-semibold text-slate-900 dark:text-white">{addr.fullName}</p>
+                      <p className="font-semibold text-slate-900 dark:text-white">{addr.fullName || addr.recipientName}</p>
                       <p>{addr.streetAddress}</p>
-                      <p>{addr.city}, {addr.state} {addr.postalCode}</p>
-                      <p>{addr.country}</p>
+                      <p>{addr.city}{addr.state ? `, ${addr.state}` : ''} {addr.postalCode || addr.zipCode}</p>
+                      <p>{addr.country || 'United States'}</p>
                       <p className="text-slate-400 pt-1">Phone: {addr.phone}</p>
                     </div>
 

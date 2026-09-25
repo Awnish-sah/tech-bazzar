@@ -34,7 +34,16 @@ export const CheckoutModal = () => {
     handlePlaceOrder
   } = useShop();
 
-  const { user, addresses, defaultAddress, openAuth } = useUser();
+  const {
+    user,
+    addresses,
+    defaultAddress,
+    fetchAddresses,
+    addAddress,
+    setDefaultAddress,
+    openAuth,
+    openDashboard
+  } = useUser();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -44,12 +53,15 @@ export const CheckoutModal = () => {
     city: '',
     postalCode: '',
     country: 'United States',
+    addressTitle: 'Home',
     paymentRef: ''
   });
 
   const [formErrors, setFormErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [saveAddressToBook, setSaveAddressToBook] = useState(false);
+  const [makeNewAddressDefault, setMakeNewAddressDefault] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('Fonepay / Online QR');
   const [showFullQr, setShowFullQr] = useState(false);
 
@@ -59,21 +71,31 @@ export const CheckoutModal = () => {
     cvc: '888'
   });
 
+  // Fetch latest addresses from PostgreSQL whenever Checkout modal opens
+  useEffect(() => {
+    if (isCheckoutOpen && user?.id) {
+      fetchAddresses(user.id);
+    }
+  }, [isCheckoutOpen, user?.id, fetchAddresses]);
+
   // Sync default address or user info when available
   useEffect(() => {
     if (defaultAddress) {
       setSelectedAddressId(defaultAddress.id);
+      setSaveAddressToBook(false);
       setFormData(prev => ({
         ...prev,
-        name: defaultAddress.fullName || user?.name || '',
-        email: user?.email || '',
+        name: defaultAddress.fullName || defaultAddress.recipientName || user?.name || '',
+        email: user?.email || prev.email || '',
         phone: defaultAddress.phone || user?.phone || '',
         address: defaultAddress.streetAddress || '',
         city: defaultAddress.city || '',
-        postalCode: defaultAddress.postalCode || '',
+        postalCode: defaultAddress.postalCode || defaultAddress.zipCode || '',
         country: defaultAddress.country || 'United States'
       }));
     } else if (user) {
+      setSaveAddressToBook(true);
+      setMakeNewAddressDefault(true);
       setFormData(prev => ({
         ...prev,
         name: user.name || prev.name || '',
@@ -85,15 +107,32 @@ export const CheckoutModal = () => {
 
   const handleSelectAddress = (addr) => {
     setSelectedAddressId(addr.id);
+    setSaveAddressToBook(false);
     setFormData(prev => ({
       ...prev,
-      name: addr.fullName,
-      email: user?.email || prev.email,
-      phone: addr.phone,
-      address: addr.streetAddress,
-      city: addr.city,
-      postalCode: addr.postalCode,
-      country: addr.country
+      name: addr.fullName || addr.recipientName || user?.name || '',
+      email: user?.email || prev.email || '',
+      phone: addr.phone || user?.phone || '',
+      address: addr.streetAddress || '',
+      city: addr.city || '',
+      postalCode: addr.postalCode || addr.zipCode || '',
+      country: addr.country || 'United States'
+    }));
+    setFormErrors({});
+  };
+
+  const handleStartNewAddress = () => {
+    setSelectedAddressId('new');
+    setSaveAddressToBook(true);
+    setMakeNewAddressDefault(addresses.length === 0);
+    setFormData(prev => ({
+      ...prev,
+      name: user?.name || prev.name || '',
+      phone: user?.phone || prev.phone || '',
+      address: '',
+      city: '',
+      postalCode: '',
+      addressTitle: 'Home'
     }));
     setFormErrors({});
   };
@@ -152,6 +191,21 @@ export const CheckoutModal = () => {
 
     try {
       setIsSubmitting(true);
+
+      // Save new address to PostgreSQL Address Book if requested or if user has no saved addresses
+      if (user && (saveAddressToBook || addresses.length === 0)) {
+        await addAddress({
+          title: formData.addressTitle || 'Home',
+          fullName: formData.name.trim(),
+          phone: formData.phone.trim(),
+          streetAddress: formData.address.trim(),
+          city: formData.city.trim(),
+          postalCode: formData.postalCode.trim(),
+          country: formData.country || 'United States',
+          isDefault: makeNewAddressDefault || addresses.length === 0
+        });
+      }
+
       const chosenMethod = paymentMethod === 'Fonepay / Online QR' && formData.paymentRef.trim()
         ? `Fonepay (${formData.paymentRef.trim()})`
         : paymentMethod;
@@ -232,42 +286,97 @@ export const CheckoutModal = () => {
                     )}
                   </h3>
 
-                  {/* Saved Address Quick-Select */}
-                  {addresses && addresses.length > 0 && (
-                    <div className="p-3 rounded-xl bg-slate-100/70 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-2">
-                      <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-cyan-500" />
-                        Select from Saved Addresses:
-                      </span>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {addresses.map(addr => {
-                          const isSelected = selectedAddressId === addr.id;
-                          return (
-                            <button
-                              key={addr.id}
-                              type="button"
-                              onClick={() => handleSelectAddress(addr)}
-                              className={`p-2.5 rounded-lg border text-left transition-all ${
-                                isSelected
-                                  ? 'bg-cyan-500/10 border-cyan-500 ring-1 ring-cyan-500/30'
-                                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-cyan-400'
-                              }`}
-                            >
-                              <div className="flex items-center justify-between text-xs font-bold text-slate-800 dark:text-white">
-                                <span>{addr.title}</span>
-                                {addr.isDefault && (
-                                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-cyan-100 text-cyan-700 dark:bg-cyan-900/60 dark:text-cyan-300">
-                                    Default
-                                  </span>
-                                )}
-                              </div>
-                              <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
-                                {addr.streetAddress}, {addr.city}
-                              </p>
-                            </button>
-                          );
-                        })}
+                  {/* Saved Address Selector (Default & All User Addresses) */}
+                  {user && (
+                    <div className="p-3.5 rounded-2xl bg-slate-100/80 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-2.5">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                          <MapPin className="w-3.5 h-3.5 text-cyan-500" />
+                          <span>Saved Delivery Addresses ({addresses?.length || 0})</span>
+                        </span>
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={handleStartNewAddress}
+                            className={`text-[11px] font-bold px-2.5 py-1 rounded-lg border transition-colors cursor-pointer ${
+                              selectedAddressId === 'new'
+                                ? 'bg-cyan-600 text-white border-cyan-600'
+                                : 'bg-white dark:bg-slate-900 text-cyan-600 dark:text-cyan-400 border-cyan-500/40 hover:bg-cyan-500/10'
+                            }`}
+                          >
+                            + Add / Use New Address
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsCheckoutOpen(false);
+                              if (openDashboard) openDashboard('addresses');
+                            }}
+                            className="text-[11px] font-semibold text-slate-500 hover:text-cyan-600 dark:text-slate-400 dark:hover:text-cyan-400 underline cursor-pointer"
+                          >
+                            Manage Book
+                          </button>
+                        </div>
                       </div>
+
+                      {addresses && addresses.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                          {addresses.map((addr) => {
+                            const isSelected = selectedAddressId === addr.id;
+                            return (
+                              <div
+                                key={addr.id}
+                                onClick={() => handleSelectAddress(addr)}
+                                className={`p-3 rounded-xl border text-left transition-all cursor-pointer relative ${
+                                  isSelected
+                                    ? 'bg-cyan-500/10 border-cyan-500 ring-2 ring-cyan-500/25 shadow-sm'
+                                    : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-cyan-400'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between gap-1 text-xs font-bold text-slate-900 dark:text-white">
+                                  <div className="flex items-center gap-1.5">
+                                    {isSelected && <CheckCircle className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400 shrink-0" />}
+                                    <span>{addr.title || 'Home'}</span>
+                                  </div>
+
+                                  {addr.isDefault ? (
+                                    <span className="text-[9px] px-2 py-0.5 rounded-full font-extrabold uppercase bg-cyan-600 text-white">
+                                      DEFAULT
+                                    </span>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setDefaultAddress(addr.id);
+                                      }}
+                                      className="text-[10px] font-semibold text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 underline cursor-pointer"
+                                    >
+                                      Set Default
+                                    </button>
+                                  )}
+                                </div>
+
+                                <div className="mt-1.5 space-y-0.5 text-[11px] text-slate-600 dark:text-slate-300">
+                                  <p className="font-semibold text-slate-800 dark:text-slate-100 truncate">
+                                    {addr.fullName || addr.recipientName}
+                                  </p>
+                                  <p className="truncate">{addr.streetAddress}</p>
+                                  <p className="truncate">
+                                    {addr.city}{addr.state ? `, ${addr.state}` : ''} {addr.postalCode || addr.zipCode}
+                                  </p>
+                                  <p className="text-[10px] text-slate-400">Tel: {addr.phone}</p>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                          No saved addresses yet. Fill in your delivery details below and it will be automatically saved as your Default Address!
+                        </p>
+                      )}
                     </div>
                   )}
 
@@ -421,6 +530,51 @@ export const CheckoutModal = () => {
                         </p>
                       )}
                     </div>
+
+                    {/* Save to Address Book & Default Option for Signed-In User */}
+                    {user && (
+                      <div className="sm:col-span-2 pt-1 flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-cyan-500/5 border border-cyan-500/20">
+                        <div className="flex flex-wrap items-center gap-4">
+                          <label className="flex items-center gap-2 cursor-pointer text-slate-700 dark:text-slate-200 font-semibold">
+                            <input
+                              type="checkbox"
+                              checked={saveAddressToBook}
+                              onChange={(e) => setSaveAddressToBook(e.target.checked)}
+                              className="rounded border-slate-300 text-cyan-600 focus:ring-cyan-500"
+                            />
+                            <span>Save this address to my Address Book</span>
+                          </label>
+
+                          {saveAddressToBook && (
+                            <label className="flex items-center gap-2 cursor-pointer text-slate-600 dark:text-slate-300">
+                              <input
+                                type="checkbox"
+                                checked={makeNewAddressDefault}
+                                onChange={(e) => setMakeNewAddressDefault(e.target.checked)}
+                                className="rounded border-slate-300 text-cyan-600 focus:ring-cyan-500"
+                              />
+                              <span>Set as Default Address</span>
+                            </label>
+                          )}
+                        </div>
+
+                        {saveAddressToBook && (
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[11px] text-slate-500">Label:</span>
+                            <select
+                              name="addressTitle"
+                              value={formData.addressTitle}
+                              onChange={handleChange}
+                              className="px-2 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-white"
+                            >
+                              <option value="Home">Home</option>
+                              <option value="Work / Office">Work / Office</option>
+                              <option value="Other">Other</option>
+                            </select>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
 

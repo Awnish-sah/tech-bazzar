@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useShop } from '../../context/ShopContext';
+import { useAdmin } from '../../context/AdminContext';
 import {
   Zap,
   Mail,
   Shield,
+  ShieldCheck,
   Truck,
   RotateCcw,
   Headphones,
@@ -15,7 +17,12 @@ import {
 
 export const Footer = ({ onOpenAdmin }) => {
   const { addToast } = useShop();
+  const { isAdminLoggedIn, orders } = useAdmin();
   const [email, setEmail] = useState('');
+
+  const adminAlertCount = (orders || []).filter(
+    (o) => (o.status === 'Cancelled' && !o.cancelAcknowledged) || o.returnStatus === 'Requested'
+  ).length;
 
   const handleSubscribe = (e) => {
     e.preventDefault();
@@ -148,20 +155,33 @@ export const Footer = ({ onOpenAdmin }) => {
         {/* Admin Portal & Security */}
         <div>
           <h4 className="text-slate-900 dark:text-white font-semibold text-sm mb-3 font-['Outfit']">Admin & Store</h4>
-          <ul className="space-y-2 text-xs">
+          <ul className="space-y-2.5 text-xs">
             <li>
               <button
                 onClick={onOpenAdmin}
-                className="text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 font-medium flex items-center gap-1.5 transition-colors"
+                className={`px-3.5 py-2 rounded-xl font-semibold flex items-center gap-2 border transition-all cursor-pointer shadow-sm ${
+                  isAdminLoggedIn
+                    ? 'bg-purple-500/15 text-purple-700 dark:text-purple-300 border-purple-400/50 hover:bg-purple-500/25'
+                    : 'bg-white dark:bg-[#121829] text-cyan-600 dark:text-cyan-400 border-slate-300 dark:border-slate-700 hover:border-cyan-500'
+                }`}
               >
-                <Lock className="w-3 h-3" />
-                <span>Admin Login Portal</span>
+                <ShieldCheck className="w-4 h-4 shrink-0" />
+                <span>{isAdminLoggedIn ? 'Open Admin Control Panel' : 'Admin Login Portal'}</span>
+                {adminAlertCount > 0 ? (
+                  <span className="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-600 text-white animate-pulse">
+                    {adminAlertCount}
+                  </span>
+                ) : (
+                  isAdminLoggedIn && (
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  )
+                )}
               </button>
             </li>
             <li><span className="text-slate-500 dark:text-slate-400">Post & Manage Products</span></li>
-            <li><span className="text-slate-500 dark:text-slate-400">Inventory & Stock Alerts</span></li>
-            <li><span className="text-slate-500 dark:text-slate-400">Customer Order Processing</span></li>
-            <li className="pt-2">
+            <li><span className="text-slate-500 dark:text-slate-400">Hero Banner Management</span></li>
+            <li><span className="text-slate-500 dark:text-slate-400">Customer Order & Cancel Review</span></li>
+            <li className="pt-1">
               <div className="inline-flex items-center gap-1.5 text-[11px] bg-white dark:bg-slate-800/80 px-2.5 py-1 rounded-md text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shadow-sm">
                 <Shield className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
                 <span>256-Bit SSL Encrypted</span>
@@ -171,17 +191,31 @@ export const Footer = ({ onOpenAdmin }) => {
         </div>
       </div>
 
-      {/* Bottom Copyright & Payment Methods */}
+      {/* Bottom Copyright, Admin Quick Link & Payment Methods */}
       <div className="border-t border-slate-200 dark:border-slate-800/50 py-6 px-4 lg:px-8">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
-          <p>© 2026 TechBazzar Inc. All rights reserved. Engineering high-performance electronic shopping experiences.</p>
-          <div className="flex items-center gap-2">
-            <span className="text-slate-500 dark:text-slate-400 mr-2">Secure Payments:</span>
+          <div className="flex flex-wrap items-center gap-3">
+            <p>© 2026 TechBazzar Inc. All rights reserved.</p>
+            <span className="hidden sm:inline text-slate-300 dark:text-slate-700">|</span>
+            <button
+              onClick={onOpenAdmin}
+              className="inline-flex items-center gap-1.5 font-semibold text-slate-600 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors cursor-pointer"
+            >
+              <Lock className="w-3 h-3 text-cyan-500" />
+              <span>Admin Panel</span>
+              {adminAlertCount > 0 && (
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-rose-600 text-white">
+                  {adminAlertCount} Alert{adminAlertCount > 1 ? 's' : ''}
+                </span>
+              )}
+            </button>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-slate-500 dark:text-slate-400 mr-1">Secure Payments:</span>
+            <span className="px-2 py-1 bg-white dark:bg-slate-800/80 rounded border border-slate-200 dark:border-slate-700 text-rose-600 dark:text-rose-400 font-bold font-mono text-[10px] shadow-sm">Fonepay QR</span>
             <span className="px-2 py-1 bg-white dark:bg-slate-800/80 rounded border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-mono text-[10px] shadow-sm">VISA</span>
             <span className="px-2 py-1 bg-white dark:bg-slate-800/80 rounded border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-mono text-[10px] shadow-sm">Mastercard</span>
             <span className="px-2 py-1 bg-white dark:bg-slate-800/80 rounded border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-mono text-[10px] shadow-sm">PayPal</span>
-            <span className="px-2 py-1 bg-white dark:bg-slate-800/80 rounded border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-mono text-[10px] shadow-sm">Apple Pay</span>
-            <span className="px-2 py-1 bg-white dark:bg-slate-800/80 rounded border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-mono text-[10px] shadow-sm">UPI</span>
           </div>
         </div>
       </div>

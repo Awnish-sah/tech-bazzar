@@ -434,6 +434,32 @@ INSERT INTO addresses (id, user_id, title, recipient_name, phone, street_address
     '97201',
     'United States',
     FALSE
+),
+(
+    3,
+    4,
+    'Home',
+    'Avanish Sah',
+    '+1 (555) 321-9876',
+    'Near Durga Mandir, Chauradano',
+    'EAST CHAMPARAN',
+    'Bihar',
+    '845302',
+    'India',
+    TRUE
+),
+(
+    4,
+    4,
+    'Work / Office',
+    'Avanish Sah',
+    '+1 (555) 321-9876',
+    'Kamaladi Business Complex, Suite 300',
+    'Kathmandu',
+    'Bagmati',
+    '44600',
+    'Nepal',
+    FALSE
 )
 ON CONFLICT (id) DO NOTHING;
 
