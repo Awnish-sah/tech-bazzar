@@ -166,11 +166,11 @@ export const CheckoutModal = () => {
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
-        <div className="relative w-full max-w-4xl rounded-3xl bg-white dark:bg-[#0E1527] border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden my-4 sm:my-8 transition-colors duration-300">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md">
+        <div className="relative w-full max-w-4xl max-h-[92vh] flex flex-col rounded-3xl bg-white dark:bg-[#0E1527] border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden transition-colors duration-300">
           
-          {/* Header */}
-          <div className="p-5 sm:p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+          {/* Sticky Header */}
+          <div className="shrink-0 p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-[#0E1527] z-10">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-600 dark:text-cyan-400">
                 <Lock className="w-4 h-4" />
@@ -186,19 +186,19 @@ export const CheckoutModal = () => {
             </div>
             <button
               onClick={() => setIsCheckoutOpen(false)}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               title="Close checkout"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Form Body */}
-          <form onSubmit={handleSubmit} noValidate>
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 p-5 sm:p-8">
+          {/* Scrollable Form Body */}
+          <form onSubmit={handleSubmit} noValidate className="flex-1 overflow-y-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 p-4 sm:p-6 items-start">
               
               {/* Left Column: Shipping & Payment (7 cols) */}
-              <div className="lg:col-span-7 space-y-6">
+              <div className="lg:col-span-7 space-y-5">
                 
                 {/* Not Signed In Banner */}
                 {!user && (
@@ -493,18 +493,22 @@ export const CheckoutModal = () => {
                       <div className="flex flex-col sm:flex-row items-center gap-5 bg-white dark:bg-slate-900/90 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
                         
                         {/* High-res QR Flyer */}
-                        <div className="relative group cursor-pointer shrink-0" onClick={() => setShowFullQr(true)}>
-                          <div className="w-40 sm:w-44 bg-white p-2 rounded-xl border border-slate-200 shadow-md">
+                        <div className="relative group cursor-pointer shrink-0 flex flex-col items-center gap-1.5" onClick={() => setShowFullQr(true)}>
+                          <div className="w-36 sm:w-40 bg-white p-2 rounded-xl border border-slate-200 shadow-md">
                             <img
                               src="/fonepay-qr.png"
                               alt="Fonepay QR Code - Avanish Kumar Sah"
                               className="w-full h-auto rounded-lg object-contain transition-transform group-hover:scale-[1.02]"
                             />
                           </div>
-                          <div className="absolute inset-0 bg-black/40 rounded-xl opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-[11px] font-bold gap-1 transition-opacity">
-                            <Maximize2 className="w-3.5 h-3.5" />
-                            <span>Enlarge QR</span>
-                          </div>
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); setShowFullQr(true); }}
+                            className="inline-flex items-center gap-1 text-[11px] font-bold text-cyan-600 dark:text-cyan-400 hover:underline cursor-pointer"
+                          >
+                            <Maximize2 className="w-3 h-3" />
+                            <span>Open Full QR Popup</span>
+                          </button>
                         </div>
 
                         {/* Merchant Details & Instruction Steps */}
@@ -609,8 +613,8 @@ export const CheckoutModal = () => {
                 </div>
               </div>
 
-              {/* Right Column: Order Summary (5 cols) */}
-              <div className="lg:col-span-5 flex flex-col justify-between p-5 rounded-2xl bg-slate-50 dark:bg-[#131B2E]/90 border border-slate-200 dark:border-slate-800 space-y-5">
+              {/* Right Column: Sticky Order Summary + Place Order Button (5 cols) */}
+              <div className="lg:col-span-5 lg:sticky lg:top-0 flex flex-col gap-5 p-5 rounded-2xl bg-slate-50 dark:bg-[#131B2E]/90 border border-slate-200 dark:border-slate-800">
                 <div className="space-y-4">
                   <h4 className="text-sm font-bold text-slate-900 dark:text-white font-['Outfit'] border-b border-slate-200 dark:border-slate-800 pb-3 flex items-center justify-between">
                     <span>Order Summary</span>
@@ -663,8 +667,8 @@ export const CheckoutModal = () => {
                   </div>
                 </div>
 
-                {/* Submit Button */}
-                <div className="space-y-3">
+                {/* Submit Button (Always visible immediately below Grand Total) */}
+                <div className="space-y-3 pt-1">
                   {formErrors.cart && (
                     <p className="text-xs text-red-500 text-center font-medium">
                       {formErrors.cart}
@@ -702,11 +706,11 @@ export const CheckoutModal = () => {
 
       {/* FULL SIZE QR MODAL PREVIEW */}
       {showFullQr && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in" onClick={() => setShowFullQr(false)}>
-          <div className="relative max-w-sm w-full bg-white p-5 rounded-3xl shadow-2xl text-center space-y-3" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in" onClick={() => setShowFullQr(false)}>
+          <div className="relative max-w-sm w-full max-h-[90vh] overflow-y-auto bg-white p-5 rounded-3xl shadow-2xl text-center space-y-3" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setShowFullQr(false)}
-              className="absolute top-3 right-3 p-1.5 rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors"
+              className="absolute top-3 right-3 p-1.5 rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -716,7 +720,7 @@ export const CheckoutModal = () => {
               <img
                 src="/fonepay-qr.png"
                 alt="Fonepay Full Flyer"
-                className="w-full h-auto rounded-xl"
+                className="w-full max-h-[60vh] object-contain mx-auto rounded-xl"
               />
             </div>
             <a
