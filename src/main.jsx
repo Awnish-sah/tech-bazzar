@@ -4,6 +4,7 @@ import { App } from './App';
 import { ThemeProvider } from './context/ThemeContext';
 import { AdminProvider } from './context/AdminContext';
 import { UserProvider } from './context/UserContext';
+import { ShopProvider } from './context/ShopContext';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
