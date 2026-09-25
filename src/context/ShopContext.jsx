@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { loadFromStorage, saveToStorage } from '../utils/storage';
 import { useAdmin } from './AdminContext';
+import { useUser } from './UserContext';
 import { generateOrderId } from '../utils/formatters';
 import { api } from '../services/api';
 
@@ -12,6 +13,7 @@ const STORAGE_KEY_CURRENCY = 'techbazzar_currency_v1';
 
 export const ShopProvider = ({ children }) => {
   const { products, recordNewOrder } = useAdmin();
+  const { user, fetchOrders } = useUser();
 
   // Cart state
   const [cart, setCart] = useState(() => {
@@ -187,6 +189,7 @@ export const ShopProvider = ({ children }) => {
   const handlePlaceOrder = async (customerData, paymentMethod) => {
     const newOrder = {
       id: generateOrderId(),
+      userId: user?.id || null,
       date: new Date().toISOString(),
       customer: customerData,
       paymentMethod,
@@ -210,6 +213,9 @@ export const ShopProvider = ({ children }) => {
     // Persist to PostgreSQL database asynchronously
     try {
       await api.createOrder(newOrder);
+      if (user?.id && fetchOrders) {
+        fetchOrders();
+      }
     } catch (err) {
       console.warn('Order saved locally (PostgreSQL sync offline):', err.message);
     }

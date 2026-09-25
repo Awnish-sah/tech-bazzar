@@ -1,5 +1,5 @@
 -- =============================================================================
--- TechBazzar E-Commerce Seed Data
+-- TechBazzar E-Commerce Seed Data (Categories, Products, Users, Addresses, Reviews, Orders)
 -- Compatible with PostgreSQL 12+ and pgAdmin 4
 -- =============================================================================
 
@@ -374,52 +374,211 @@ ON CONFLICT (id) DO UPDATE SET
     description = EXCLUDED.description,
     specs = EXCLUDED.specs;
 
--- 3. Insert Customers
+-- 3. Insert Customers (for guest checkout legacy support)
 INSERT INTO customers (id, name, email, phone, address, city) VALUES
-(1, 'Alex Rivera', 'alex.rivera@example.com', '+1 (555) 234-5678', '742 Evergreen Terrace', 'Springfield'),
+(1, 'Alex Rivera', 'user@techbazzar.com', '+1 (555) 234-5678', '742 Evergreen Terrace', 'Springfield'),
 (2, 'Sophia Chen', 'sophia.chen@example.com', '+1 (555) 987-6543', '120 Market Street, Suite 400', 'San Francisco')
 ON CONFLICT (id) DO NOTHING;
 
--- 4. Insert Demo Orders
+-- 4. Insert Demo Registered Users (Alex Rivera & Sophia Chen)
+INSERT INTO users (id, name, email, password_hash, phone, avatar, provider) VALUES
+(
+    1,
+    'Alex Rivera',
+    'user@techbazzar.com',
+    'password123',
+    '+1 (555) 234-5678',
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+    'local'
+),
+(
+    2,
+    'Sophia Chen',
+    'sophia.chen@example.com',
+    'password123',
+    '+1 (555) 987-6543',
+    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
+    'google'
+)
+ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    phone = EXCLUDED.phone,
+    password_hash = EXCLUDED.password_hash;
+
+SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));
+
+-- 5. Insert Multiple Addresses for User 1 (Alex Rivera)
+INSERT INTO addresses (id, user_id, title, recipient_name, phone, street_address, city, state, zip_code, country, is_default) VALUES
+(
+    1,
+    1,
+    'Home',
+    'Alex Rivera',
+    '+1 (555) 234-5678',
+    '742 Evergreen Terrace',
+    'Springfield',
+    'Oregon',
+    '97477',
+    'United States',
+    TRUE
+),
+(
+    2,
+    1,
+    'Tech Hub Office',
+    'Alex Rivera (Work Desk #42)',
+    '+1 (555) 234-5678',
+    '100 Silicon Blvd, Floor 4, Suite 400',
+    'Portland',
+    'Oregon',
+    '97201',
+    'United States',
+    FALSE
+)
+ON CONFLICT (id) DO NOTHING;
+
+SELECT setval('addresses_id_seq', (SELECT MAX(id) FROM addresses));
+
+-- 6. Insert Demo Orders (with tracking, couriers, invoices, cancellation/return eligibility)
 INSERT INTO orders (
-    id, customer_id, customer_name, customer_email, customer_phone,
-    customer_address, customer_city, total, payment_method, status
+    id, user_id, customer_id, customer_name, customer_email, customer_phone,
+    customer_address, customer_city, total, subtotal, discount, shipping, tax,
+    payment_method, status, tracking_number, courier_name, estimated_delivery,
+    delivered_at, invoice_number, created_at
 ) VALUES
 (
     'TB-847291-3012',
     1,
+    1,
     'Alex Rivera',
-    'alex.rivera@example.com',
+    'user@techbazzar.com',
     '+1 (555) 234-5678',
-    '742 Evergreen Terrace',
-    'Springfield, OR',
+    '742 Evergreen Terrace, Springfield, OR',
+    'Springfield',
     3528.00,
+    3528.00,
+    0,
+    0,
+    0,
     'Credit Card',
-    'Delivered'
+    'Delivered',
+    'FDX-99824128-US',
+    'FedEx Priority',
+    CURRENT_TIMESTAMP - INTERVAL '2 days',
+    CURRENT_TIMESTAMP - INTERVAL '2 days',
+    'INV-2026-00847',
+    CURRENT_TIMESTAMP - INTERVAL '5 days'
 ),
 (
     'TB-921473-8941',
+    1,
+    1,
+    'Alex Rivera',
+    'user@techbazzar.com',
+    '+1 (555) 234-5678',
+    '100 Silicon Blvd, Floor 4, Suite 400, Portland, OR',
+    'Portland',
+    999.00,
+    999.00,
+    0,
+    0,
+    0,
+    'UPI / Wallet',
+    'Processing',
+    'DHL-48192034-US',
+    'DHL Express',
+    CURRENT_TIMESTAMP + INTERVAL '3 days',
+    NULL,
+    'INV-2026-00921',
+    CURRENT_TIMESTAMP - INTERVAL '4 hours'
+),
+(
+    'TB-104928-5521',
+    2,
     2,
     'Sophia Chen',
     'sophia.chen@example.com',
     '+1 (555) 987-6543',
-    '120 Market Street, Suite 400',
-    'San Francisco, CA',
-    999.00,
-    'UPI / Wallet',
-    'Processing'
+    '120 Market Street, Suite 400, San Francisco, CA',
+    'San Francisco',
+    1299.00,
+    1299.00,
+    0,
+    0,
+    0,
+    'Credit Card',
+    'Shipped',
+    'UPS-77291044-US',
+    'UPS Ground',
+    CURRENT_TIMESTAMP + INTERVAL '1 day',
+    NULL,
+    'INV-2026-01049',
+    CURRENT_TIMESTAMP - INTERVAL '1 day'
 )
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET
+    user_id = EXCLUDED.user_id,
+    tracking_number = EXCLUDED.tracking_number,
+    courier_name = EXCLUDED.courier_name,
+    invoice_number = EXCLUDED.invoice_number,
+    status = EXCLUDED.status;
 
--- 5. Insert Order Items
+-- 7. Insert Order Line Items
 INSERT INTO order_items (order_id, product_id, name, price, quantity, image) VALUES
 ('TB-847291-3012', 'prod-1', 'Apple MacBook Pro 16" (M3 Max, 64GB, 1TB SSD)', 3199.00, 1, 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=600&q=80'),
 ('TB-847291-3012', 'prod-3', 'Sony WH-1000XM5 Wireless Noise-Canceling Headphones', 329.00, 1, 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80'),
-('TB-921473-8941', 'prod-7', 'Apple iPhone 16 Pro (Titanium Black, 256GB)', 999.00, 1, 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=600&q=80')
+('TB-921473-8941', 'prod-7', 'Apple iPhone 16 Pro (Titanium Black, 256GB)', 999.00, 1, 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=600&q=80'),
+('TB-104928-5521', 'prod-2', 'Samsung Galaxy S24 Ultra 5G (Titanium Gray, 512GB)', 1299.00, 1, 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?auto=format&fit=crop&w=600&q=80')
 ON CONFLICT DO NOTHING;
 
--- 6. Insert Default Admin User (admin@techbazzar.com / admin123)
+-- 8. Insert Verified Product Reviews
+INSERT INTO reviews (product_id, user_id, user_name, user_avatar, rating, title, comment, verified_purchase, created_at) VALUES
+(
+    'prod-1',
+    1,
+    'Alex Rivera',
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+    5,
+    'The Best Laptop I Have Ever Owned',
+    'The M3 Max chip is unbelievably fast for Docker containers and heavy compilation. The Liquid Retina XDR screen is stunning, and battery life easily lasts through an entire workday.',
+    TRUE,
+    CURRENT_TIMESTAMP - INTERVAL '3 days'
+),
+(
+    'prod-1',
+    2,
+    'Sophia Chen',
+    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
+    5,
+    'Pro Studio Quality Performance',
+    'Rendered 4K ProRes videos without even turning on the fans. The keyboard and trackpad feel premium. Highly recommended for creative pros.',
+    TRUE,
+    CURRENT_TIMESTAMP - INTERVAL '7 days'
+),
+(
+    'prod-3',
+    1,
+    'Alex Rivera',
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+    5,
+    'Silence on Flight & Incredible Audio',
+    'Wore these on a 6-hour flight and could not hear engine noise at all. Soundstage is clean with deep sub-bass and crisp highs.',
+    TRUE,
+    CURRENT_TIMESTAMP - INTERVAL '1 day'
+),
+(
+    'prod-2',
+    2,
+    'Sophia Chen',
+    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
+    5,
+    'The 200MP Camera and Flat Screen are Game Changers',
+    'Galaxy AI features like circle to search and live translation are super helpful when traveling. The titanium build feels durable yet light.',
+    TRUE,
+    CURRENT_TIMESTAMP - INTERVAL '4 days'
+)
+ON CONFLICT DO NOTHING;
+
+-- 9. Insert Default Admin User (admin@techbazzar.com / admin123)
 INSERT INTO admin_users (email, password_hash, role) VALUES
 ('admin@techbazzar.com', 'admin123', 'admin')
 ON CONFLICT (email) DO NOTHING;
-

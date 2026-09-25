@@ -6,57 +6,41 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Load .env
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+
 const { Pool } = pg;
 
-let pool = null;
-let isConnected = false;
+const poolConfig = process.env.DATABASE_URL
+  ? {
+      connectionString: process.env.DATABASE_URL,
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+    }
+  : {
+      host: process.env.PGHOST || 'localhost',
+      port: parseInt(process.env.PGPORT || '5432', 10),
+      user: process.env.PGUSER || 'postgres',
+      password: process.env.PGPASSWORD || 'postgres',
+      database: process.env.PGDATABASE || 'techbazzar_db',
+      ssl: process.env.PGSSL === 'true' ? { rejectUnauthorized: false } : false,
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 5000
+    };
 
-const createPool = () => {
-  // Reload .env in case credentials were just updated
-  dotenv.config({ path: path.resolve(__dirname, '../../.env'), override: true });
+export const pool = new Pool(poolConfig);
 
-  const poolConfig = process.env.DATABASE_URL
-    ? {
-        connectionString: process.env.DATABASE_URL,
-        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-      }
-    : {
-        host: process.env.PGHOST || 'localhost',
-        port: parseInt(process.env.PGPORT || '5432', 10),
-        user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'postgres',
-        database: process.env.PGDATABASE || 'techbazzar_db',
-        ssl: process.env.PGSSL === 'true' ? { rejectUnauthorized: false } : false
-      };
-
-  const newPool = new Pool(poolConfig);
-
-  newPool.on('error', (err) => {
-    console.error('⚠️ Unexpected PostgreSQL pool error on idle client:', err.message);
-  });
-
-  return newPool;
-};
-
-// Initialize pool
-pool = createPool();
+pool.on('error', (err) => {
+  console.error('⚠️ Unexpected PostgreSQL pool error on idle client:', err.message);
+});
 
 /**
  * Execute a parameterized SQL query
  */
 export const query = async (text, params) => {
-  if (!pool || !isConnected) {
-    // If not connected, try reinitializing pool with current .env
-    try {
-      if (pool) await pool.end().catch(() => {});
-    } catch (e) {}
-    pool = createPool();
-  }
-
   const start = Date.now();
   try {
     const res = await pool.query(text, params);
-    isConnected = true;
     const duration = Date.now() - start;
     if (process.env.DEBUG_SQL === 'true') {
       console.log('Executed query', { text: text.slice(0, 80), duration, rows: res.rowCount });
@@ -69,21 +53,12 @@ export const query = async (text, params) => {
 };
 
 /**
- * Health check helper to verify PostgreSQL connectivity with auto-reconnect
+ * Health check helper to verify PostgreSQL connectivity
  */
 export const checkConnection = async () => {
-  // Always reload .env when checking connection if not connected
-  if (!isConnected) {
-    try {
-      if (pool) await pool.end().catch(() => {});
-    } catch (e) {}
-    pool = createPool();
-  }
-
   const start = Date.now();
   try {
     const res = await pool.query('SELECT current_database() AS db, version() AS version;');
-    isConnected = true;
     const latencyMs = Date.now() - start;
     return {
       connected: true,
@@ -92,7 +67,6 @@ export const checkConnection = async () => {
       latencyMs
     };
   } catch (error) {
-    isConnected = false;
     const targetHost = process.env.PGHOST || 'localhost';
     const targetPort = process.env.PGPORT || '5432';
     const errorMsg = error.message || (error.code ? `Connection error: ${error.code}` : 'Connection failed');
@@ -104,8 +78,6 @@ export const checkConnection = async () => {
     };
   }
 };
-
-export { pool };
 
 export default {
   pool,

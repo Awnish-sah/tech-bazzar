@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
 import { useShop } from '../../context/ShopContext';
+import { useUser } from '../../context/UserContext';
 import { formatPrice } from '../../utils/formatters';
 import {
   X,
@@ -9,7 +9,9 @@ import {
   Lock,
   CheckCircle,
   QrCode,
-  DollarSign
+  DollarSign,
+  MapPin,
+  Sparkles
 } from 'lucide-react';
 
 export const CheckoutModal = () => {
@@ -26,15 +28,45 @@ export const CheckoutModal = () => {
     handlePlaceOrder
   } = useShop();
 
-  const [formData, setFormData] = useState({
-    name: 'Alex Rivera',
-    email: 'alex.rivera@techbazzar-customer.com',
-    phone: '+1 (555) 321-9876',
-    address: '450 Innovation Parkway, Suite 300',
-    city: 'San Jose',
-    postalCode: '95134',
-    country: 'United States'
+  const { user, addresses, defaultAddress } = useUser();
+
+  const [formData, setFormData] = useState(() => {
+    if (defaultAddress) {
+      return {
+        name: defaultAddress.fullName || user?.name || 'Alex Rivera',
+        email: user?.email || 'alex.rivera@techbazzar-customer.com',
+        phone: defaultAddress.phone || user?.phone || '+1 (555) 321-9876',
+        address: defaultAddress.streetAddress || '450 Innovation Parkway, Suite 300',
+        city: defaultAddress.city || 'San Jose',
+        postalCode: defaultAddress.postalCode || '95134',
+        country: defaultAddress.country || 'United States'
+      };
+    }
+    return {
+      name: user?.name || 'Alex Rivera',
+      email: user?.email || 'alex.rivera@techbazzar-customer.com',
+      phone: user?.phone || '+1 (555) 321-9876',
+      address: '450 Innovation Parkway, Suite 300',
+      city: 'San Jose',
+      postalCode: '95134',
+      country: 'United States'
+    };
   });
+
+  const [selectedAddressId, setSelectedAddressId] = useState(defaultAddress?.id || null);
+
+  const handleSelectAddress = (addr) => {
+    setSelectedAddressId(addr.id);
+    setFormData({
+      name: addr.fullName,
+      email: user?.email || formData.email,
+      phone: addr.phone,
+      address: addr.streetAddress,
+      city: addr.city,
+      postalCode: addr.postalCode,
+      country: addr.country
+    });
+  };
 
   const [paymentMethod, setPaymentMethod] = useState('Credit Card');
   const [cardDetails, setCardDetails] = useState({
@@ -87,10 +119,57 @@ export const CheckoutModal = () => {
               
               {/* Shipping Address */}
               <div className="space-y-4">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-400 flex items-center gap-2">
-                  <Truck className="w-4 h-4" />
-                  <span>1. Shipping Information</span>
+                <h3 className="text-sm font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-400 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Truck className="w-4 h-4" />
+                    <span>1. Shipping Information</span>
+                  </div>
+                  {user && (
+                    <span className="text-[11px] font-normal text-slate-500 lowercase flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-cyan-500" />
+                      signed in as {user.name}
+                    </span>
+                  )}
                 </h3>
+
+                {/* Saved Address Quick-Select */}
+                {addresses && addresses.length > 0 && (
+                  <div className="p-3 rounded-xl bg-slate-100/70 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-2">
+                    <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-cyan-500" />
+                      Deliver to Saved Address:
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {addresses.map(addr => {
+                        const isSelected = selectedAddressId === addr.id;
+                        return (
+                          <button
+                            key={addr.id}
+                            type="button"
+                            onClick={() => handleSelectAddress(addr)}
+                            className={`p-2.5 rounded-lg border text-left transition-all ${
+                              isSelected
+                                ? 'bg-cyan-500/10 border-cyan-500 ring-1 ring-cyan-500/30'
+                                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-cyan-400'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between text-xs font-bold text-slate-800 dark:text-white">
+                              <span>{addr.title}</span>
+                              {addr.isDefault && (
+                                <span className="text-[9px] px-1.5 py-0.2 rounded bg-cyan-100 text-cyan-700 dark:bg-cyan-900/60 dark:text-cyan-300">
+                                  Default
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                              {addr.streetAddress}, {addr.city}
+                            </p>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                   <div className="sm:col-span-2">

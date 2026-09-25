@@ -137,6 +137,125 @@ export const api = {
     });
   },
 
+  getUserOrders: async (userId, filters = {}) => {
+    const query = new URLSearchParams();
+    if (filters.search) query.set('search', filters.search);
+    if (filters.status && filters.status !== 'all') query.set('status', filters.status);
+    const queryString = query.toString();
+    return request(`/orders/user/${userId}${queryString ? `?${queryString}` : ''}`);
+  },
+
+  getOrderTracking: async (orderId) => {
+    return request(`/orders/${orderId}/tracking`);
+  },
+
+  getOrderInvoice: async (orderId) => {
+    return request(`/orders/${orderId}/invoice`);
+  },
+
+  cancelOrder: async (orderId, { reason } = {}) => {
+    return request(`/orders/${orderId}/cancel`, {
+      method: 'POST',
+      body: JSON.stringify({ reason })
+    });
+  },
+
+  returnOrder: async (orderId, { reason, comments } = {}) => {
+    return request(`/orders/${orderId}/return`, {
+      method: 'POST',
+      body: JSON.stringify({ reason, comments })
+    });
+  },
+
+  /**
+   * User Authentication Endpoints
+   */
+  register: async (userData) => {
+    return request('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(userData)
+    });
+  },
+
+  login: async (credentials) => {
+    return request('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials)
+    });
+  },
+
+  ssoLogin: async (ssoData) => {
+    return request('/auth/sso', {
+      method: 'POST',
+      body: JSON.stringify(ssoData)
+    });
+  },
+
+  getMe: async (token) => {
+    return request('/auth/me', {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    });
+  },
+
+  updateProfile: async (userId, profileData) => {
+    return request('/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify({ userId, ...profileData })
+    });
+  },
+
+  /**
+   * Address Book Endpoints
+   */
+  getAddresses: async (userId) => {
+    return request(`/users/addresses?userId=${userId}`);
+  },
+
+  addAddress: async (addressData) => {
+    return request('/users/addresses', {
+      method: 'POST',
+      body: JSON.stringify(addressData)
+    });
+  },
+
+  updateAddress: async (addressId, addressData) => {
+    return request(`/users/addresses/${addressId}`, {
+      method: 'PUT',
+      body: JSON.stringify(addressData)
+    });
+  },
+
+  deleteAddress: async (addressId) => {
+    return request(`/users/addresses/${addressId}`, {
+      method: 'DELETE'
+    });
+  },
+
+  setDefaultAddress: async (addressId, userId) => {
+    return request(`/users/addresses/${addressId}/default`, {
+      method: 'PATCH',
+      body: JSON.stringify({ userId })
+    });
+  },
+
+  /**
+   * Reviews & Ratings Endpoints
+   */
+  getProductReviews: async (productId) => {
+    return request(`/reviews/product/${productId}`);
+  },
+
+  getUserReviews: async (userId) => {
+    return request(`/reviews/user/${userId}`);
+  },
+
+  createReview: async (reviewData) => {
+    return request('/reviews', {
+      method: 'POST',
+      body: JSON.stringify(reviewData)
+    });
+  },
+
   /**
    * Admin Endpoints
    */
@@ -153,4 +272,5 @@ export const api = {
 };
 
 export default api;
+
 

@@ -31,10 +31,10 @@ async function initDatabase() {
     console.log('📦 Executing schema.sql (Creating tables, indexes, triggers)...');
     const schemaSql = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
     await pool.query(schemaSql);
-    console.log('✅ Tables created successfully: categories, products, customers, orders, order_items, admin_users.');
+    console.log('✅ Tables created/updated successfully: categories, products, users, addresses, customers, orders, order_items, reviews, admin_users.');
 
     // 2. Run seed.sql
-    console.log('🌱 Executing seed.sql (Populating default products & sample data)...');
+    console.log('🌱 Executing seed.sql (Populating default products, users, addresses & reviews)...');
     const seedSql = fs.readFileSync(path.join(__dirname, 'seed.sql'), 'utf8');
     await pool.query(seedSql);
     console.log('✅ Seed data inserted successfully.');
@@ -43,11 +43,17 @@ async function initDatabase() {
     const productsRes = await pool.query('SELECT COUNT(*) FROM products;');
     const ordersRes = await pool.query('SELECT COUNT(*) FROM orders;');
     const categoriesRes = await pool.query('SELECT COUNT(*) FROM categories;');
+    const usersRes = await pool.query('SELECT COUNT(*) FROM users;');
+    const addressesRes = await pool.query('SELECT COUNT(*) FROM addresses;');
+    const reviewsRes = await pool.query('SELECT COUNT(*) FROM reviews;');
 
     console.log('\n📊 Database Status Summary:');
     console.log(`   - Categories: ${categoriesRes.rows[0].count}`);
     console.log(`   - Products:   ${productsRes.rows[0].count}`);
     console.log(`   - Orders:     ${ordersRes.rows[0].count}`);
+    console.log(`   - Users:      ${usersRes.rows[0].count}`);
+    console.log(`   - Addresses:  ${addressesRes.rows[0].count}`);
+    console.log(`   - Reviews:    ${reviewsRes.rows[0].count}`);
     console.log('\n🎉 TechBazzar PostgreSQL database is fully initialized and ready!\n');
 
     process.exit(0);
@@ -60,4 +66,3 @@ async function initDatabase() {
 }
 
 initDatabase();
-

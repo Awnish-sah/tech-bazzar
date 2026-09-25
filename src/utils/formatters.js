@@ -29,3 +29,22 @@ export const generateOrderId = () => {
   const random = Math.floor(1000 + Math.random() * 9000);
   return `TB-${timestamp}-${random}`;
 };
+
+export const formatDate = (dateString) => {
+  if (!dateString) return 'N/A';
+  try {
+    const d = new Date(dateString);
+    if (isNaN(d.getTime())) return String(dateString);
+    return d.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  } catch {
+    return String(dateString);
+  }
+};
+
+export const formatCurrency = (amount, currencyCode = 'USD') => {
+  return formatPrice(amount || 0, currencyCode);
+};

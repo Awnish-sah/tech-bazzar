@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
 import { useShop } from '../../context/ShopContext';
 import { useAdmin } from '../../context/AdminContext';
 import { useTheme } from '../../context/ThemeContext';
+import { useUser } from '../../context/UserContext';
 import { CURRENCIES, formatPrice } from '../../utils/formatters';
 import {
   Search,
@@ -17,7 +17,13 @@ import {
   SlidersHorizontal,
   ChevronDown,
   Moon,
-  Sun
+  Sun,
+  User,
+  Package,
+  MapPin,
+  Star,
+  LogOut,
+  Sparkles
 } from 'lucide-react';
 
 export const Navbar = ({ onOpenAdmin, onViewMode, currentView }) => {
@@ -36,8 +42,11 @@ export const Navbar = ({ onOpenAdmin, onViewMode, currentView }) => {
 
   const { isAdminLoggedIn } = useAdmin();
   const { theme, toggleTheme, isDark } = useTheme();
+  const { user, openAuth, openDashboard, logout } = useUser();
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currencyDropdownOpen, setCurrencyDropdownOpen] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
   const categories = [
     { label: 'All Tech', id: 'all' },
@@ -185,6 +194,88 @@ export const Navbar = ({ onOpenAdmin, onViewMode, currentView }) => {
               </button>
             )}
 
+            {/* User Account / Sign In */}
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                  className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-xl border border-slate-200 dark:border-white/10 hover:border-blue-400 bg-white dark:bg-white/5 text-slate-800 dark:text-slate-200 text-xs font-semibold shadow-sm transition-all"
+                >
+                  <img
+                    src={user.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80'}
+                    alt={user.name}
+                    className="w-6 h-6 rounded-full object-cover ring-1 ring-blue-500/50"
+                  />
+                  <span className="hidden lg:inline max-w-[100px] truncate">{user.name.split(' ')[0]}</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                </button>
+
+                {userDropdownOpen && (
+                  <div 
+                    className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#121829] border border-slate-200 dark:border-slate-700/80 rounded-2xl shadow-2xl py-2 z-50 text-xs animate-fade-in"
+                    onMouseLeave={() => setUserDropdownOpen(false)}
+                  >
+                    <div className="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800">
+                      <p className="font-bold text-slate-900 dark:text-white truncate">{user.name}</p>
+                      <p className="text-[11px] text-slate-400 truncate">{user.email}</p>
+                    </div>
+
+                    <div className="py-1">
+                      <button
+                        onClick={() => { openDashboard('orders'); setUserDropdownOpen(false); }}
+                        className="w-full text-left px-4 py-2 hover:bg-blue-50 dark:hover:bg-slate-800 flex items-center gap-2.5 text-slate-700 dark:text-slate-300 font-medium transition-colors"
+                      >
+                        <Package className="w-4 h-4 text-blue-500" />
+                        <span>My Orders & Tracking</span>
+                      </button>
+
+                      <button
+                        onClick={() => { openDashboard('addresses'); setUserDropdownOpen(false); }}
+                        className="w-full text-left px-4 py-2 hover:bg-blue-50 dark:hover:bg-slate-800 flex items-center gap-2.5 text-slate-700 dark:text-slate-300 font-medium transition-colors"
+                      >
+                        <MapPin className="w-4 h-4 text-cyan-500" />
+                        <span>Delivery Addresses</span>
+                      </button>
+
+                      <button
+                        onClick={() => { openDashboard('reviews'); setUserDropdownOpen(false); }}
+                        className="w-full text-left px-4 py-2 hover:bg-blue-50 dark:hover:bg-slate-800 flex items-center gap-2.5 text-slate-700 dark:text-slate-300 font-medium transition-colors"
+                      >
+                        <Star className="w-4 h-4 text-amber-500" />
+                        <span>My Reviews</span>
+                      </button>
+
+                      <button
+                        onClick={() => { openDashboard('profile'); setUserDropdownOpen(false); }}
+                        className="w-full text-left px-4 py-2 hover:bg-blue-50 dark:hover:bg-slate-800 flex items-center gap-2.5 text-slate-700 dark:text-slate-300 font-medium transition-colors"
+                      >
+                        <User className="w-4 h-4 text-purple-500" />
+                        <span>Profile Settings</span>
+                      </button>
+                    </div>
+
+                    <div className="border-t border-slate-100 dark:border-slate-800 pt-1">
+                      <button
+                        onClick={() => { logout(); setUserDropdownOpen(false); }}
+                        className="w-full text-left px-4 py-2 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center gap-2.5 text-rose-600 dark:text-rose-400 font-medium transition-colors"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={() => openAuth('login')}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/60 dark:hover:bg-blue-900/40 transition-all shadow-sm"
+              >
+                <User className="w-4 h-4" />
+                <span>Sign In</span>
+              </button>
+            )}
+
             {/* Wishlist */}
             <button
               onClick={() => {
@@ -234,6 +325,56 @@ export const Navbar = ({ onOpenAdmin, onViewMode, currentView }) => {
         {/* Mobile Search & Sub-Nav */}
         {mobileMenuOpen && (
           <div className="md:hidden mt-3 pt-3 border-t border-slate-200 dark:border-slate-800 space-y-3">
+            {/* User Account Mobile Card */}
+            {user ? (
+              <div className="p-3 rounded-xl bg-blue-50/70 dark:bg-slate-800/80 border border-blue-100 dark:border-slate-700 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <img 
+                      src={user.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80'} 
+                      alt="" 
+                      className="w-8 h-8 rounded-full object-cover ring-1 ring-blue-500" 
+                    />
+                    <div>
+                      <p className="text-xs font-bold text-slate-900 dark:text-white leading-tight">{user.name}</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400">{user.email}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => { logout(); setMobileMenuOpen(false); }}
+                    className="p-1.5 text-rose-500 hover:bg-rose-100/50 rounded-lg text-xs"
+                    title="Sign Out"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-1.5 pt-1 text-xs">
+                  <button
+                    onClick={() => { openDashboard('orders'); setMobileMenuOpen(false); }}
+                    className="p-2 rounded-lg bg-white dark:bg-slate-700/80 font-medium text-slate-800 dark:text-slate-200 text-center flex items-center justify-center gap-1.5 shadow-xs"
+                  >
+                    <Package className="w-3.5 h-3.5 text-blue-500" />
+                    <span>My Orders</span>
+                  </button>
+                  <button
+                    onClick={() => { openDashboard('addresses'); setMobileMenuOpen(false); }}
+                    className="p-2 rounded-lg bg-white dark:bg-slate-700/80 font-medium text-slate-800 dark:text-slate-200 text-center flex items-center justify-center gap-1.5 shadow-xs"
+                  >
+                    <MapPin className="w-3.5 h-3.5 text-cyan-500" />
+                    <span>Addresses</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => { openAuth('login'); setMobileMenuOpen(false); }}
+                className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow"
+              >
+                <User className="w-4 h-4" />
+                <span>Sign In / Create Account</span>
+              </button>
+            )}
+
             <div className="relative">
               <input
                 type="text"

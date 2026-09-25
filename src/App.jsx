@@ -15,6 +15,12 @@ import { CheckoutModal } from './components/store/CheckoutModal';
 import { OrderConfirmationModal } from './components/store/OrderConfirmationModal';
 import { AdminLoginModal } from './components/admin/AdminLoginModal';
 import { AdminDashboard } from './components/admin/AdminDashboard';
+import { UserAuthModal } from './components/user/UserAuthModal';
+import { UserDashboard } from './components/user/UserDashboard';
+import { OrderTrackingModal } from './components/user/OrderTrackingModal';
+import { OrderDetailsModal } from './components/user/OrderDetailsModal';
+import { InvoiceModal } from './components/user/InvoiceModal';
+import { CancelReturnModal } from './components/user/CancelReturnModal';
 
 export const App = () => {
   const { isAdminLoggedIn } = useAdmin();
@@ -85,6 +91,14 @@ export const App = () => {
         onClose={() => setIsLoginModalOpen(false)}
         onSuccess={handleLoginSuccess}
       />
+
+      {/* User Module Modals */}
+      <UserAuthModal />
+      <UserDashboard />
+      <OrderTrackingModal />
+      <OrderDetailsModal />
+      <InvoiceModal />
+      <CancelReturnModal />
     </div>
   );
 };
