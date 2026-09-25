@@ -37,6 +37,7 @@ export const UserDashboard = () => {
     user, 
     logout, 
     addresses, 
+    fetchAddresses,
     addAddress, 
     updateAddress, 
     deleteAddress, 
