@@ -1,25 +1,21 @@
-# Netlify Deployment Configuration for TechBazzar
-# https://docs.netlify.com/configure-builds/file-based-configuration/
-
 [build]
   command = "npm run build"
   publish = "dist"
+  functions = "netlify/functions"
 
-# SPA Fallback: Routes all frontend traffic to index.html
+[functions]
+  node_bundler = "esbuild"
+  included_files = ["server/db/*.sql"]
+
+# Proxy all /api/* requests to the Netlify Serverless Express API function
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = true
+
+# SPA fallback: send all client-side routes to index.html
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
-
-[[headers]]
-  for = "/assets/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"

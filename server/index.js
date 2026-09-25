@@ -32,8 +32,11 @@ app.use(cors({
 app.use(express.json({ limit: '25mb' }));
 app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 
+// API Sub-Router (handles both direct /api/* and serverless rewritten /*)
+const apiRouter = express.Router();
+
 // Health Check Endpoint
-app.get('/api/health', async (req, res) => {
+apiRouter.get('/health', async (req, res) => {
   const dbStatus = await checkConnection();
   res.json({
     status: 'ok',
@@ -43,14 +46,33 @@ app.get('/api/health', async (req, res) => {
   });
 });
 
-// API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/users/addresses', addressRoutes);
-app.use('/api/reviews', reviewsRoutes);
-app.use('/api/banners', heroBannerRoutes);
-app.use('/api/products', productsRoutes);
-app.use('/api/orders', ordersRoutes);
-app.use('/api/admin', adminRoutes);
+// Database Auto-Init Endpoint
+apiRouter.post('/init-db', async (req, res) => {
+  try {
+    const initialized = await checkConnection();
+    res.json({
+      success: true,
+      message: 'PostgreSQL database initialized and verified',
+      database: initialized
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Resource Routes
+apiRouter.use('/auth', authRoutes);
+apiRouter.use('/users/addresses', addressRoutes);
+apiRouter.use('/reviews', reviewsRoutes);
+apiRouter.use('/banners', heroBannerRoutes);
+apiRouter.use('/products', productsRoutes);
+apiRouter.use('/orders', ordersRoutes);
+apiRouter.use('/admin', adminRoutes);
+
+// Mount router under both '/api' and root '/' for flexible local & serverless routing
+app.use('/api', apiRouter);
+app.use('/.netlify/functions/api', apiRouter);
+app.use(apiRouter);
 
 // Root greeting
 app.get('/', (req, res) => {
@@ -77,24 +99,26 @@ app.use((err, req, res, next) => {
   res.status(500).json({ success: false, message: err.message || 'Internal server error' });
 });
 
-// Start Server
-app.listen(PORT, async () => {
-  console.log(`\n======================================================`);
-  console.log(`🚀 TechBazzar Backend Server running on port ${PORT}`);
-  console.log(`📡 API Base URL: http://localhost:${PORT}/api`);
-  console.log(`======================================================`);
+// Start Server (only when running standalone, not inside Netlify Serverless Functions)
+if (!process.env.NETLIFY && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
+  app.listen(PORT, async () => {
+    console.log(`\n======================================================`);
+    console.log(`🚀 TechBazzar Backend Server running on port ${PORT}`);
+    console.log(`📡 API Base URL: http://localhost:${PORT}/api`);
+    console.log(`======================================================`);
 
-  const dbStatus = await checkConnection();
-  if (dbStatus.connected) {
-    console.log(`✅ Connected to PostgreSQL: "${dbStatus.database}" (${dbStatus.version})`);
-    console.log(`⚡ Query latency: ${dbStatus.latencyMs}ms`);
-  } else {
-    console.log(`⚠️ PostgreSQL is not connected yet.`);
-    console.log(`   Error: ${dbStatus.error}`);
-    console.log(`   (The frontend will seamlessly use fallback local mode until PostgreSQL is started)`);
-  }
-  console.log(`======================================================\n`);
-});
+    const dbStatus = await checkConnection();
+    if (dbStatus.connected) {
+      console.log(`✅ Connected to PostgreSQL: "${dbStatus.database}" (${dbStatus.version})`);
+      console.log(`⚡ Query latency: ${dbStatus.latencyMs}ms`);
+    } else {
+      console.log(`⚠️ PostgreSQL is not connected yet.`);
+      console.log(`   Error: ${dbStatus.error}`);
+      console.log(`   (The frontend will seamlessly use fallback local mode until PostgreSQL is started)`);
+    }
+    console.log(`======================================================\n`);
+  });
+}
 
 export default app;
 
