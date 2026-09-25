@@ -4,17 +4,16 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = typeof import.meta?.url === 'string'
+  ? path.dirname(fileURLToPath(import.meta.url))
+  : process.cwd();
 
 // Load .env
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 const { Pool } = pg;
 
-const DEFAULT_NEON_URL = 'postgresql://neondb_owner:npg_mAECLdX32yqF@ep-polished-feather-b34msen7-pooler.c-4.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
-
-const rawConnectionString = process.env.DATABASE_URL || process.env.NETLIFY_DATABASE_URL || DEFAULT_NEON_URL;
+const rawConnectionString = process.env.DATABASE_URL || process.env.NETLIFY_DATABASE_URL;
 // Sanitize channel_binding=require for node-postgres compatibility with Neon Pooler
 const connectionString = rawConnectionString
   ? rawConnectionString.replace(/([?&])channel_binding=require(&?)/gi, (match, p1, p2) => (p1 === '?' && p2 ? '?' : p2 ? p1 : ''))

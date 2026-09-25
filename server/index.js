@@ -13,8 +13,9 @@ import reviewsRoutes from './routes/reviewsRoutes.js';
 import heroBannerRoutes from './routes/heroBannerRoutes.js';
 import { checkConnection } from './config/db.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = typeof import.meta?.url === 'string'
+  ? path.dirname(fileURLToPath(import.meta.url))
+  : process.cwd();
 
 // Load .env
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
