@@ -82,27 +82,27 @@ export const AdminDashboard = ({ onBackToStore }) => {
     <div className="min-h-screen bg-slate-50 dark:bg-[#070A12] text-slate-900 dark:text-slate-100 transition-colors duration-300">
       
       {/* Admin Top Navigation */}
-      <div className="border-b border-slate-200 dark:border-slate-800/80 bg-white/90 dark:bg-[#0A0E1A]/90 backdrop-blur-md sticky top-0 z-30 px-4 lg:px-8 py-3.5 transition-colors">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-purple-500/10 dark:bg-purple-500/20 border border-purple-300 dark:border-purple-500/40 flex items-center justify-center text-purple-600 dark:text-purple-400 shadow-sm dark:shadow-glow-purple">
-              <ShieldCheck className="w-5 h-5" />
+      <div className="border-b border-slate-200 dark:border-slate-800/80 bg-white/90 dark:bg-[#0A0E1A]/90 backdrop-blur-md sticky top-0 z-30 px-3 sm:px-6 lg:px-8 py-3 transition-colors">
+        <div className="max-w-7xl 2xl:max-w-[1440px] mx-auto flex flex-wrap items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-purple-500/10 dark:bg-purple-500/20 border border-purple-300 dark:border-purple-500/40 flex items-center justify-center text-purple-600 dark:text-purple-400 shadow-sm dark:shadow-glow-purple shrink-0">
+              <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div>
-              <h1 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-['Outfit'] flex items-center gap-2">
-                <span>TechBazzar Admin Control Panel</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 font-mono">
+            <div className="min-w-0">
+              <h1 className="text-sm sm:text-lg font-bold text-slate-900 dark:text-white font-['Outfit'] flex items-center gap-1.5 sm:gap-2 truncate">
+                <span className="truncate">TechBazzar Admin Control</span>
+                <span className="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 font-mono shrink-0">
                   LIVE
                 </span>
               </h1>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400">Post products, upload media & manage customer orders</p>
+              <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 truncate">Post products, upload media & manage customer orders</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             {/* Database Status Badge */}
             <div
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border text-[11px] sm:text-xs font-semibold ${
                 dbConnectionStatus === 'connected'
                   ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-400'
                   : 'bg-amber-500/10 border-amber-500/30 text-amber-700 dark:text-amber-400'
@@ -137,10 +137,10 @@ export const AdminDashboard = ({ onBackToStore }) => {
 
             <button
               onClick={onBackToStore}
-              className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 text-xs font-semibold border border-slate-200 dark:border-slate-700 flex items-center gap-1.5 transition-colors shadow-sm dark:shadow-none"
+              className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 text-xs font-semibold border border-slate-200 dark:border-slate-700 flex items-center gap-1.5 transition-colors shadow-sm dark:shadow-none"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Storefront</span>
+              <span className="hidden xs:inline">Storefront</span>
             </button>
 
             <button
@@ -155,7 +155,7 @@ export const AdminDashboard = ({ onBackToStore }) => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 lg:px-8 py-8 space-y-8">
+      <div className="max-w-7xl 2xl:max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 space-y-6 sm:space-y-8">
         
         {/* Real-Time Customer Cancellation & Return Alert Banner */}
         {actionRequiredCount > 0 && (

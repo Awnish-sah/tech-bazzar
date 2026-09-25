@@ -131,26 +131,26 @@ export const ProductQuickView = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/80 backdrop-blur-md">
       {/* Modal Dialog */}
       <div 
-        className="relative w-full max-w-4xl rounded-3xl bg-white dark:bg-[#0E1527] border border-slate-200 dark:border-slate-700/80 shadow-2xl overflow-hidden my-8 transition-colors duration-300"
+        className="relative w-full max-w-4xl max-h-[92dvh] flex flex-col rounded-2xl sm:rounded-3xl bg-white dark:bg-[#0E1527] border border-slate-200 dark:border-slate-700/80 shadow-2xl overflow-hidden transition-colors duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={() => { setQuickViewProduct(null); setActiveTab('overview'); }}
-          className="absolute top-4 right-4 z-20 p-2 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
+          className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 p-2 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
           title="Close modal"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Tab Toggle Navigation */}
-        <div className="flex border-b border-slate-200 dark:border-slate-800 px-6 pt-4 bg-slate-50/50 dark:bg-slate-900/50">
+        <div className="flex border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 pt-3 sm:pt-4 pr-14 bg-slate-50/50 dark:bg-slate-900/50 shrink-0 overflow-x-auto scrollbar-none">
           <button
             onClick={() => setActiveTab('overview')}
-            className={`py-3 px-4 font-semibold text-xs sm:text-sm border-b-2 transition-all ${
+            className={`py-2.5 sm:py-3 px-3 sm:px-4 font-semibold text-xs sm:text-sm border-b-2 transition-all whitespace-nowrap ${
               activeTab === 'overview'
                 ? 'border-cyan-500 text-cyan-600 dark:text-cyan-400'
                 : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -160,7 +160,7 @@ export const ProductQuickView = () => {
           </button>
           <button
             onClick={() => setActiveTab('reviews')}
-            className={`py-3 px-4 font-semibold text-xs sm:text-sm border-b-2 flex items-center gap-1.5 transition-all ${
+            className={`py-2.5 sm:py-3 px-3 sm:px-4 font-semibold text-xs sm:text-sm border-b-2 flex items-center gap-1.5 transition-all whitespace-nowrap ${
               activeTab === 'reviews'
                 ? 'border-cyan-500 text-cyan-600 dark:text-cyan-400'
                 : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -174,9 +174,11 @@ export const ProductQuickView = () => {
           </button>
         </div>
 
-        {/* TAB 1: PRODUCT OVERVIEW */}
-        {activeTab === 'overview' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 sm:p-8">
+        {/* Scrollable Content Body */}
+        <div className="flex-1 overflow-y-auto">
+          {/* TAB 1: PRODUCT OVERVIEW */}
+          {activeTab === 'overview' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 p-4 sm:p-8">
             {/* Left Column: Image Showcase */}
             <div className="space-y-4">
               <div className="relative aspect-square rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
@@ -559,7 +561,8 @@ export const ProductQuickView = () => {
               )}
             </div>
           </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

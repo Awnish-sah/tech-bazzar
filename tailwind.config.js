@@ -7,6 +7,10 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      screens: {
+        'xs': '380px',
+        '3xl': '1920px',
+      },
       colors: {
         tech: {
           dark: '#0A0E1A',

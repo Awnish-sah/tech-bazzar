@@ -33,18 +33,18 @@ export const CategoryPills = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 lg:px-8 py-6">
-      <div className="flex items-center justify-between mb-4">
+    <div className="max-w-7xl 2xl:max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2 transition-colors">
+          <h2 className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2 transition-colors">
             <span>Browse By Category</span>
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Explore cutting-edge tech hardware curated for enthusiasts</p>
+          <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">Explore cutting-edge tech hardware curated for enthusiasts</p>
         </div>
       </div>
 
       {/* Category Scroll Container */}
-      <div className="flex items-center gap-2.5 overflow-x-auto pb-2 scrollbar-none">
+      <div className="flex items-center gap-2 sm:gap-2.5 overflow-x-auto pb-2 scrollbar-none smooth-scroll">
         {CATEGORY_CONFIG.map((cat) => {
           const Icon = cat.icon;
           const isSelected = selectedCategory === cat.id;
@@ -53,8 +53,12 @@ export const CategoryPills = () => {
           return (
             <button
               key={cat.id}
-              onClick={() => setSelectedCategory(cat.id)}
-              className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all duration-200 border ${
+              onClick={() => {
+                setSelectedCategory(cat.id);
+                const el = document.getElementById('catalog-section');
+                if (cat.id !== 'all' && el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              }}
+              className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all duration-200 border shrink-0 ${
                 isSelected
                   ? 'bg-gradient-to-r from-cyan-500/15 to-blue-500/15 text-cyan-700 dark:text-cyan-300 border-cyan-500 shadow-sm dark:shadow-glow-cyan'
                   : 'bg-white dark:bg-[#121829]/70 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700/60 hover:bg-slate-100 dark:hover:bg-[#1A2238] hover:border-slate-300 dark:hover:border-slate-600 hover:text-slate-900 dark:hover:text-white shadow-sm dark:shadow-none'

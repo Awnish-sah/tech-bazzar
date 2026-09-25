@@ -51,7 +51,7 @@ export const App = () => {
       {currentView === 'admin' && isAdminLoggedIn ? (
         <AdminDashboard onBackToStore={() => setCurrentView('store')} />
       ) : (
-        <div className="flex-1 flex flex-col justify-between">
+        <div className="flex-1 flex flex-col justify-between pb-20 md:pb-0 overflow-x-hidden">
           <div>
             {/* Storefront Header */}
             <Navbar

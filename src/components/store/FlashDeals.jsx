@@ -36,40 +36,40 @@ export const FlashDeals = () => {
   if (flashDealProducts.length === 0) return null;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 lg:px-8 py-8">
+    <div id="flash-deals-section" className="max-w-7xl 2xl:max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
       {/* Header with Timer */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-gradient-to-r from-rose-50 via-white to-purple-50 dark:from-rose-950/40 dark:via-[#121829] dark:to-purple-950/30 border border-rose-200 dark:border-rose-500/20 shadow-sm dark:shadow-none mb-6 transition-colors duration-300">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-rose-50 via-white to-purple-50 dark:from-rose-950/40 dark:via-[#121829] dark:to-purple-950/30 border border-rose-200 dark:border-rose-500/20 shadow-sm dark:shadow-none mb-5 sm:mb-6 transition-colors duration-300">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-rose-500/10 dark:bg-rose-500/20 border border-rose-500/30 flex items-center justify-center">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-rose-500/10 dark:bg-rose-500/20 border border-rose-500/30 flex items-center justify-center shrink-0">
             <Flame className="w-5 h-5 text-rose-500 dark:text-rose-400 fill-rose-500/30 dark:fill-rose-400 animate-pulse" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <h2 className="text-base sm:text-xl font-bold text-slate-900 dark:text-white flex flex-wrap items-center gap-2">
               <span>Lightning Flash Deals</span>
-              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-500/30">
+              <span className="text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-500/30">
                 Up to 25% OFF
               </span>
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Exclusive time-limited discounts on flagship electronics</p>
+            <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">Exclusive time-limited discounts on flagship electronics</p>
           </div>
         </div>
 
         {/* Countdown Timer Units */}
-        <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+        <div className="flex items-center justify-between sm:justify-end gap-2 text-slate-600 dark:text-slate-300 pt-2 sm:pt-0 border-t sm:border-t-0 border-rose-200/50 dark:border-rose-500/20">
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1 mr-1">
             <Clock className="w-3.5 h-3.5 text-rose-500 dark:text-rose-400" />
             <span>Ends In:</span>
           </span>
           <div className="flex items-center gap-1 font-mono">
-            <div className="bg-white dark:bg-[#0A0E1A] border border-rose-200 dark:border-rose-500/30 px-2 py-1 rounded-lg text-sm font-bold text-rose-600 dark:text-rose-400 shadow-sm dark:shadow-none">
+            <div className="bg-white dark:bg-[#0A0E1A] border border-rose-200 dark:border-rose-500/30 px-2 py-1 rounded-lg text-xs sm:text-sm font-bold text-rose-600 dark:text-rose-400 shadow-sm dark:shadow-none">
               {String(timeLeft.hours).padStart(2, '0')}h
             </div>
             <span className="text-rose-500 dark:text-rose-400 font-bold">:</span>
-            <div className="bg-white dark:bg-[#0A0E1A] border border-rose-200 dark:border-rose-500/30 px-2 py-1 rounded-lg text-sm font-bold text-rose-600 dark:text-rose-400 shadow-sm dark:shadow-none">
+            <div className="bg-white dark:bg-[#0A0E1A] border border-rose-200 dark:border-rose-500/30 px-2 py-1 rounded-lg text-xs sm:text-sm font-bold text-rose-600 dark:text-rose-400 shadow-sm dark:shadow-none">
               {String(timeLeft.minutes).padStart(2, '0')}m
             </div>
             <span className="text-rose-500 dark:text-rose-400 font-bold">:</span>
-            <div className="bg-white dark:bg-[#0A0E1A] border border-rose-200 dark:border-rose-500/30 px-2 py-1 rounded-lg text-sm font-bold text-rose-600 dark:text-rose-400 shadow-sm dark:shadow-none">
+            <div className="bg-white dark:bg-[#0A0E1A] border border-rose-200 dark:border-rose-500/30 px-2 py-1 rounded-lg text-xs sm:text-sm font-bold text-rose-600 dark:text-rose-400 shadow-sm dark:shadow-none">
               {String(timeLeft.seconds).padStart(2, '0')}s
             </div>
           </div>
@@ -77,7 +77,7 @@ export const FlashDeals = () => {
       </div>
 
       {/* Flash Products Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-5">
         {flashDealProducts.map((product) => {
           const discount = calculateDiscount(product.price, product.salePrice);
           const currentPrice = product.salePrice || product.price;
@@ -88,7 +88,10 @@ export const FlashDeals = () => {
               className="group relative rounded-2xl bg-white dark:bg-[#121829]/90 border border-slate-200/90 dark:border-slate-700/60 hover:border-cyan-500/50 shadow-sm hover:shadow-xl dark:hover:shadow-glow-card transition-all duration-300 flex flex-col justify-between overflow-hidden"
             >
               {/* Image & Discount Badge */}
-              <div className="relative aspect-video sm:aspect-square w-full bg-slate-100 dark:bg-slate-900/60 overflow-hidden">
+              <div
+                onClick={() => setQuickViewProduct(product)}
+                className="relative aspect-[4/3] sm:aspect-square w-full bg-slate-100 dark:bg-slate-900/60 overflow-hidden cursor-pointer"
+              >
                 <img
                   src={product.images[0]}
                   alt={product.name}
@@ -97,18 +100,21 @@ export const FlashDeals = () => {
                 
                 {/* Discount Badge */}
                 {discount > 0 && (
-                  <div className="absolute top-2.5 left-2.5 px-2 py-1 rounded-lg bg-rose-600 text-white font-mono font-bold text-xs shadow-lg">
+                  <div className="absolute top-2.5 left-2.5 px-2 py-0.5 sm:py-1 rounded-lg bg-rose-600 text-white font-mono font-bold text-[11px] sm:text-xs shadow-lg">
                     -{discount}%
                   </div>
                 )}
 
                 {/* Quick View Button */}
                 <button
-                  onClick={() => setQuickViewProduct(product)}
-                  className="absolute bottom-2.5 right-2.5 p-2 rounded-xl bg-white/90 hover:bg-cyan-500 hover:text-white dark:bg-[#0A0E1A]/80 dark:hover:bg-cyan-500 dark:hover:text-black text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-white/10 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-md"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setQuickViewProduct(product);
+                  }}
+                  className="absolute bottom-2.5 right-2.5 p-2 rounded-xl bg-white/90 hover:bg-cyan-500 hover:text-white dark:bg-[#0A0E1A]/85 dark:hover:bg-cyan-500 dark:hover:text-black text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-white/10 backdrop-blur-md opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 shadow-md"
                   title="Quick View"
                 >
-                  <Eye className="w-4 h-4" />
+                  <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
               </div>
 

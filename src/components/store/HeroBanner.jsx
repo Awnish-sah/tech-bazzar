@@ -110,24 +110,24 @@ export const HeroBanner = () => {
     : (typeof slide.specs === 'string' ? JSON.parse(slide.specs || '[]') : []);
 
   return (
-    <div className="relative max-w-7xl mx-auto px-4 lg:px-8 pt-6 pb-4">
+    <div className="relative max-w-7xl 2xl:max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-2 sm:pb-4">
       {/* Banner Container */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-cyan-50/40 to-slate-100 dark:from-[#10172A] dark:via-[#0E1527] dark:to-[#0A0E1A] border border-slate-200/90 dark:border-cyan-500/20 shadow-xl dark:shadow-2xl min-h-[460px] md:min-h-[500px] flex items-center transition-colors duration-300">
+      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-white via-cyan-50/40 to-slate-100 dark:from-[#10172A] dark:via-[#0E1527] dark:to-[#0A0E1A] border border-slate-200/90 dark:border-cyan-500/20 shadow-xl dark:shadow-2xl min-h-[420px] md:min-h-[500px] flex flex-col justify-between lg:flex-row lg:items-center transition-colors duration-300 pb-14 sm:pb-12 lg:pb-0">
         
         {/* Ambient Glow Orbs */}
-        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-cyan-500/10 dark:bg-cyan-500/15 blur-3xl pointer-events-none"></div>
-        <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-purple-500/10 dark:bg-purple-500/15 blur-3xl pointer-events-none"></div>
+        <div className="absolute -top-32 -left-32 w-72 sm:w-96 h-72 sm:h-96 rounded-full bg-cyan-500/10 dark:bg-cyan-500/15 blur-3xl pointer-events-none"></div>
+        <div className="absolute -bottom-32 -right-32 w-72 sm:w-96 h-72 sm:h-96 rounded-full bg-purple-500/10 dark:bg-purple-500/15 blur-3xl pointer-events-none"></div>
 
         {/* Content Grid */}
-        <div className="relative z-10 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center p-6 sm:p-10 md:p-14">
+        <div className="relative z-10 w-full grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center p-5 sm:p-8 md:p-12 lg:p-14">
           
           {/* Text Information (Left) */}
-          <div className="lg:col-span-7 space-y-5 text-left">
+          <div className="lg:col-span-7 space-y-4 sm:space-y-5 text-left">
             
             {/* Promo Tag */}
             {slide.badge && (
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-700 dark:text-cyan-300 text-xs font-semibold backdrop-blur-md">
-                <Sparkles className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 sm:py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-700 dark:text-cyan-300 text-[11px] sm:text-xs font-semibold backdrop-blur-md">
+                <Sparkles className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400 shrink-0" />
                 <span>{slide.badge}</span>
               </div>
             )}
@@ -135,28 +135,28 @@ export const HeroBanner = () => {
             {/* Subtitle & Title */}
             <div>
               {slide.subtitle && (
-                <p className="text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 font-semibold mb-1">
+                <p className="text-[10px] sm:text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 font-semibold mb-1">
                   {slide.subtitle}
                 </p>
               )}
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+              <h1 className="text-2xl xs:text-3xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
                 {slide.title}
               </h1>
             </div>
 
             {slide.tagline && (
-              <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base max-w-lg leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-base max-w-lg leading-relaxed">
                 {slide.tagline}
               </p>
             )}
 
             {/* Key Specs Pills */}
             {specsList.length > 0 && (
-              <div className="flex flex-wrap gap-2 pt-1">
+              <div className="flex flex-wrap gap-1.5 sm:gap-2 pt-1">
                 {specsList.map((spec, i) => (
                   <span
                     key={i}
-                    className="px-2.5 py-1 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-300 text-xs font-medium shadow-sm dark:shadow-none"
+                    className="px-2 sm:px-2.5 py-1 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-300 text-[11px] sm:text-xs font-medium shadow-sm dark:shadow-none"
                   >
                     {spec}
                   </span>
@@ -165,25 +165,25 @@ export const HeroBanner = () => {
             )}
 
             {/* Pricing & CTA */}
-            <div className="pt-2 flex flex-wrap items-center gap-4 sm:gap-6">
+            <div className="pt-1 sm:pt-2 flex flex-col xs:flex-row flex-wrap items-start xs:items-center gap-3 sm:gap-6">
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white font-mono">
+                <span className="text-2xl xs:text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white font-mono">
                   {formatPrice(slide.price, currency)}
                 </span>
                 {slide.originalPrice && (
-                  <span className="text-base text-slate-400 dark:text-slate-500 line-through font-mono">
+                  <span className="text-sm sm:text-base text-slate-400 dark:text-slate-500 line-through font-mono">
                     {formatPrice(slide.originalPrice, currency)}
                   </span>
                 )}
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 w-full xs:w-auto">
                 <a
                   href={slide.link || "#catalog-section"}
-                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold text-sm shadow-md hover:shadow-cyan-500/20 dark:shadow-glow-cyan flex items-center gap-2 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
+                  className="flex-1 xs:flex-none justify-center px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold text-xs sm:text-sm shadow-md hover:shadow-cyan-500/20 dark:shadow-glow-cyan flex items-center gap-2 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
                 >
                   <span>Explore Catalog</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 shrink-0" />
                 </a>
 
                 <button
@@ -192,7 +192,7 @@ export const HeroBanner = () => {
                     const el = document.getElementById('catalog-section');
                     if (el) el.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="px-4 py-3 rounded-xl bg-white hover:bg-slate-50 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 text-sm font-medium shadow-sm dark:shadow-none transition-colors"
+                  className="px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-white hover:bg-slate-50 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 text-xs sm:text-sm font-medium shadow-sm dark:shadow-none transition-colors"
                 >
                   View Deals
                 </button>
@@ -202,7 +202,7 @@ export const HeroBanner = () => {
 
           {/* Product Cutout/Image (Right) */}
           <div className="lg:col-span-5 flex justify-center items-center relative">
-            <div className="relative group w-full max-w-md aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border border-slate-200/80 dark:border-white/10">
+            <div className="relative group w-full max-w-md aspect-[16/10] sm:aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border border-slate-200/80 dark:border-white/10">
               <img
                 src={slide.image}
                 alt={slide.title}
@@ -211,9 +211,9 @@ export const HeroBanner = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent dark:from-[#0A0E1A]/80"></div>
               
               {/* Floating verified badge */}
-              <div className="absolute bottom-4 left-4 bg-white/90 dark:bg-[#0A0E1A]/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-200 dark:border-cyan-500/30 flex items-center gap-2 shadow-lg">
+              <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 bg-white/90 dark:bg-[#0A0E1A]/90 backdrop-blur-md px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl border border-slate-200 dark:border-cyan-500/30 flex items-center gap-2 shadow-lg">
                 <div className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse"></div>
-                <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">Official Tech Warranty</span>
+                <span className="text-[11px] sm:text-xs font-semibold text-slate-800 dark:text-slate-200">Official Tech Warranty</span>
               </div>
             </div>
           </div>
@@ -221,11 +221,11 @@ export const HeroBanner = () => {
 
         {/* Slide Controls */}
         {slides.length > 1 && (
-          <div className="absolute bottom-4 right-6 flex items-center gap-2 z-20">
+          <div className="absolute bottom-3.5 inset-x-0 sm:inset-x-auto sm:bottom-4 sm:right-6 flex items-center justify-center sm:justify-end gap-2 z-20">
             <button
               type="button"
               onClick={handlePrev}
-              className="p-2 rounded-full bg-white/80 hover:bg-white text-slate-700 dark:bg-white/5 dark:hover:bg-white/10 dark:text-slate-300 border border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none transition-colors"
+              className="p-2 rounded-full bg-white/90 hover:bg-white text-slate-700 dark:bg-white/10 dark:hover:bg-white/20 dark:text-slate-200 border border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none transition-colors"
               title="Previous slide"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -248,7 +248,7 @@ export const HeroBanner = () => {
             <button
               type="button"
               onClick={handleNext}
-              className="p-2 rounded-full bg-white/80 hover:bg-white text-slate-700 dark:bg-white/5 dark:hover:bg-white/10 dark:text-slate-300 border border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none transition-colors"
+              className="p-2 rounded-full bg-white/90 hover:bg-white text-slate-700 dark:bg-white/10 dark:hover:bg-white/20 dark:text-slate-200 border border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none transition-colors"
               title="Next slide"
             >
               <ChevronRight className="w-4 h-4" />
