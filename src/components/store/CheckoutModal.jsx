@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import { useShop } from '../../context/ShopContext';
 import { useUser } from '../../context/UserContext';
 import { formatPrice } from '../../utils/formatters';
@@ -30,30 +31,40 @@ export const CheckoutModal = () => {
 
   const { user, addresses, defaultAddress } = useUser();
 
-  const [formData, setFormData] = useState(() => {
-    if (defaultAddress) {
-      return {
-        name: defaultAddress.fullName || user?.name || 'Alex Rivera',
-        email: user?.email || 'alex.rivera@techbazzar-customer.com',
-        phone: defaultAddress.phone || user?.phone || '+1 (555) 321-9876',
-        address: defaultAddress.streetAddress || '450 Innovation Parkway, Suite 300',
-        city: defaultAddress.city || 'San Jose',
-        postalCode: defaultAddress.postalCode || '95134',
-        country: defaultAddress.country || 'United States'
-      };
-    }
-    return {
-      name: user?.name || 'Alex Rivera',
-      email: user?.email || 'alex.rivera@techbazzar-customer.com',
-      phone: user?.phone || '+1 (555) 321-9876',
-      address: '450 Innovation Parkway, Suite 300',
-      city: 'San Jose',
-      postalCode: '95134',
-      country: 'United States'
-    };
+  const [formData, setFormData] = useState({
+    name: user?.name || 'Alex Rivera',
+    email: user?.email || 'alex.rivera@techbazzar-customer.com',
+    phone: user?.phone || '+1 (555) 321-9876',
+    address: '450 Innovation Parkway, Suite 300',
+    city: 'San Jose',
+    postalCode: '95134',
+    country: 'United States'
   });
 
-  const [selectedAddressId, setSelectedAddressId] = useState(defaultAddress?.id || null);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+
+  // Sync default address when loaded from PostgreSQL
+  useEffect(() => {
+    if (defaultAddress) {
+      setSelectedAddressId(defaultAddress.id);
+      setFormData({
+        name: defaultAddress.fullName || user?.name || '',
+        email: user?.email || '',
+        phone: defaultAddress.phone || user?.phone || '',
+        address: defaultAddress.streetAddress || '',
+        city: defaultAddress.city || '',
+        postalCode: defaultAddress.postalCode || '',
+        country: defaultAddress.country || 'United States'
+      });
+    } else if (user) {
+      setFormData(prev => ({
+        ...prev,
+        name: user.name || prev.name,
+        email: user.email || prev.email,
+        phone: user.phone || prev.phone
+      }));
+    }
+  }, [defaultAddress, user]);
 
   const handleSelectAddress = (addr) => {
     setSelectedAddressId(addr.id);
