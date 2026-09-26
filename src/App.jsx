@@ -21,6 +21,7 @@ import { OrderTrackingModal } from './components/user/OrderTrackingModal';
 import { OrderDetailsModal } from './components/user/OrderDetailsModal';
 import { InvoiceModal } from './components/user/InvoiceModal';
 import { CancelReturnModal } from './components/user/CancelReturnModal';
+import { InstallAppPrompt } from './components/common/InstallAppPrompt';
 
 export const App = () => {
   const { isAdminLoggedIn } = useAdmin();
@@ -99,6 +100,9 @@ export const App = () => {
       <OrderDetailsModal />
       <InvoiceModal />
       <CancelReturnModal />
+
+      {/* Progressive Web App Mobile Install Prompt */}
+      <InstallAppPrompt />
     </div>
   );
 };

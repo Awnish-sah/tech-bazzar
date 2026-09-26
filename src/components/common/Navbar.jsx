@@ -24,7 +24,8 @@ import {
   MapPin,
   Star,
   LogOut,
-  Sparkles
+  Sparkles,
+  Download
 } from 'lucide-react';
 
 export const Navbar = ({ onOpenAdmin, onViewMode, currentView }) => {
@@ -161,7 +162,7 @@ export const Navbar = ({ onOpenAdmin, onViewMode, currentView }) => {
             </div>
 
             {/* Navigation Actions */}
-            <div className="flex items-center gap-1.5 sm:gap-2.5">
+            <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
               {/* Night / Light Mode Toggle Button */}
               <button
                 onClick={toggleTheme}
@@ -261,10 +262,12 @@ export const Navbar = ({ onOpenAdmin, onViewMode, currentView }) => {
               ) : (
                 <button
                   onClick={() => openAuth('login')}
-                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-xl text-xs font-semibold bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/60 dark:hover:bg-blue-900/40 transition-all shadow-sm"
+                  className="p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-semibold bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/60 dark:hover:bg-blue-900/40 transition-all shadow-sm flex items-center justify-center gap-1.5 shrink-0"
+                  title="Sign In"
+                  aria-label="Sign In"
                 >
                   <User className="w-4 h-4" />
-                  <span className="hidden xs:inline">Sign In</span>
+                  <span className="hidden md:inline">Sign In</span>
                 </button>
               )}
 
@@ -275,7 +278,7 @@ export const Navbar = ({ onOpenAdmin, onViewMode, currentView }) => {
                   const wishlistElem = document.getElementById('catalog-section');
                   if (wishlistElem) wishlistElem.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="relative p-2 sm:p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 hover:text-rose-600 shadow-sm dark:bg-white/5 dark:hover:bg-white/10 dark:border-white/10 dark:text-slate-300 dark:hover:text-rose-400 transition-colors"
+                className="relative p-2 sm:p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 hover:text-rose-600 shadow-sm dark:bg-white/5 dark:hover:bg-white/10 dark:border-white/10 dark:text-slate-300 dark:hover:text-rose-400 transition-colors shrink-0"
                 title="Wishlist"
               >
                 <Heart className="w-4 h-4" />
@@ -289,7 +292,8 @@ export const Navbar = ({ onOpenAdmin, onViewMode, currentView }) => {
               {/* Cart Trigger */}
               <button
                 onClick={() => setIsCartOpen(true)}
-                className="flex items-center gap-2 px-2.5 sm:px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold text-xs sm:text-sm shadow-md dark:shadow-glow-cyan transition-all transform active:scale-95"
+                className="flex items-center gap-1.5 sm:gap-2 p-2 sm:px-3.5 sm:py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold text-xs sm:text-sm shadow-md dark:shadow-glow-cyan transition-all transform active:scale-95 shrink-0"
+                title="Shopping Cart"
               >
                 <div className="relative">
                   <ShoppingCart className="w-4 h-4" />
@@ -307,7 +311,7 @@ export const Navbar = ({ onOpenAdmin, onViewMode, currentView }) => {
               {/* Mobile Menu Toggle */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300"
+                className="md:hidden p-2 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 shrink-0 ml-0.5"
                 aria-label="Toggle Menu"
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -395,6 +399,18 @@ export const Navbar = ({ onOpenAdmin, onViewMode, currentView }) => {
                   <span>Sign In / Create Account</span>
                 </button>
               )}
+
+              {/* Install Mobile App Button */}
+              <button
+                onClick={() => {
+                  window.dispatchEvent(new CustomEvent('techbazzar:open-install-prompt'));
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-md dark:shadow-glow-cyan transition-all"
+              >
+                <Download className="w-4 h-4" />
+                <span>Install Mobile App (PWA)</span>
+              </button>
 
               {/* Mobile Theme Toggle */}
               <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
